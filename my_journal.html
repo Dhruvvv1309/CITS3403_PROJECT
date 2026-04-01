@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Journal – cuplog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #F2EDE4;
+      font-family: 'DM Sans', sans-serif;
+      color: #2C1A0E;
+    }
+
+    /* ── NAVBAR ── */
+    .top-nav {
+      background: #2C1A0E;
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #F2EDE4;
+      text-decoration: none;
+    }
+
+    .brand span {
+      color: #C47F3C;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #c8b99a;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #F2EDE4;
+    }
+
+    .nav-user {
+      background: #C47F3C;
+      color: #F2EDE4;
+      border: none;
+      border-radius: 50px;
+      padding: 0.45rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-user:hover {
+      background: #a86830;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: #2C1A0E;
+      padding: 2.5rem 2rem 2rem;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #F2EDE4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2C1A0E;
+      flex-shrink: 0;
+    }
+
+    .hero-info {
+      flex: 1;
+    }
+
+    .hero-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #F2EDE4;
+      margin-bottom: 0.2rem;
+    }
+
+    .hero-sub {
+      color: #c8b99a;
+      font-size: 0.9rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      border: 1.5px solid #c8b99a;
+      color: #F2EDE4;
+      border-radius: 50px;
+      padding: 0.25rem 0.9rem;
+      font-size: 0.8rem;
+      margin-right: 0.4rem;
+    }
+
+    .badge-pill.gold {
+      border-color: #C47F3C;
+      color: #C47F3C;
+    }
+
+    .btn-follow {
+      background: #C47F3C;
+      color: #F2EDE4;
+      border: none;
+      border-radius: 50px;
+      padding: 0.5rem 1.6rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .btn-follow:hover {
+      background: #a86830;
+    }
+
+    /* ── STATS ROW ── */
+    .stats-section {
+      max-width: 900px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: #EAE4DA;
+      border-radius: 12px;
+      padding: 1.4rem 1rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2C1A0E;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #7a6550;
+      margin-top: 0.2rem;
+    }
+
+    /* ── JOURNAL SECTION ── */
+    .journal-section {
+      max-width: 900px;
+      margin: 0 auto 3rem;
+      padding: 0 1rem;
+    }
+
+    .journal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2C1A0E;
+      margin-bottom: 1rem;
+    }
+
+    /* ── ENTRY CARD ── */
+    .entry-card {
+      background: #FAF7F2;
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .entry-main {
+      flex: 1;
+    }
+
+    .entry-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #2C1A0E;
+      margin-bottom: 0.2rem;
+    }
+
+    .entry-meta {
+      font-size: 0.82rem;
+      color: #9C8469;
+      margin-bottom: 0.4rem;
+    }
+
+    .entry-stars {
+      color: #C47F3C;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .entry-note {
+      font-size: 0.88rem;
+      color: #5a4535;
+      line-height: 1.5;
+    }
+
+    .entry-photo {
+      width: 90px;
+      height: 80px;
+      background: #E0D8CC;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #9C8469;
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #2C1A0E;
+      color: #7a6550;
+      font-size: 0.8rem;
+      padding: 1.2rem 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="top-nav">
+  <a class="brand" href="#"><span>cup</span>log</a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">My journal</a></li>
+    <li><a href="#">Log a coffee</a></li>
+    <li><a href="#">Community</a></li>
+  </ul>
+  <button class="nav-user">@winston</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="avatar">WC</div>
+    <div class="hero-info">
+      <div class="hero-name">Winston C.</div>
+      <div class="hero-sub">Espresso lover · Perth</div>
+      <div>
+        <span class="badge-pill">42 coffees</span>
+        <span class="badge-pill gold">Flat white regular</span>
+        <span class="badge-pill">Explorer</span>
+      </div>
+    </div>
+    <button class="btn-follow">Follow</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stat-card">
+    <span class="stat-number">42</span>
+    <div class="stat-label">coffees logged</div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-number">4.2</span>
+    <div class="stat-label">avg rating</div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-number">Flat white</span>
+    <div class="stat-label">top pick</div>
+  </div>
+</div>
+
+<!-- JOURNAL ENTRIES -->
+<section class="journal-section">
+  <div class="journal-title">Winston's journal</div>
+
+  <!-- Entry 1 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Magic Latte</div>
+      <div class="entry-meta">Latte · Sideshow Espresso, Northbridge · yesterday</div>
+      <div class="entry-stars">★★★★★</div>
+      <p class="entry-note">Incredibly silky texture with a sweet almond finish. Almost too pretty to drink.</p>
+    </div>
+    <div class="entry-photo">photo</div>
+  </div>
+
+  <!-- Entry 2 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Single Origin Espresso</div>
+      <div class="entry-meta">Espresso · Telegram Coffee, CBD · 3 days ago</div>
+      <div class="entry-stars">★★★★½</div>
+      <p class="entry-note">Ethiopian Yirgacheffe — bright berry notes, clean chocolate finish.</p>
+    </div>
+    <div class="entry-photo">photo</div>
+  </div>
+
+  <!-- Entry 3 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Cold Brew Tonic</div>
+      <div class="entry-meta">Cold brew · Humblebee, Leederville · 5 days ago</div>
+      <div class="entry-stars">★★★★☆</div>
+      <p class="entry-note">Refreshing with tonic cutting through the bitterness. Great on a hot day.</p>
+    </div>
+    <div class="entry-photo">photo</div>
+  </div>
+
+  <!-- Entry 4 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">V60 Pour Over</div>
+      <div class="entry-meta">Pour over · Strange Company, Fremantle · 1 week ago</div>
+      <div class="entry-stars">★★★★★</div>
+      <p class="entry-note">Beautifully balanced. Floral jasmine notes with a honey sweetness.</p>
+    </div>
+    <div class="entry-photo">photo</div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  cuplog · CITS3403 Group Project 2025
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
