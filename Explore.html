@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Explore</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&family=Playfair+Display&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="top-nav">
+  <a href="explore.html" class="brand">Cup<span>Log</span></a>
+
+  <ul class="nav-links">
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="journal.html">My Journal</a></li>
+    <li><a href="login.html">Logout</a></li>
+  </ul>
+</div>
+
+<!-- CONTENT -->
+<div class="page-container container">
+
+  <h2 class="mb-2">Explore Community ☕</h2>
+  <p class="subtitle">Discover coffee lovers and their favourite brews</p>
+
+  <!-- SEARCH -->
+  <input type="text" id="searchUser" class="form-control search-bar" placeholder="Search community members...">
+
+  <!-- MAP PLACEHOLDER -->
+  <div id="map" class="mb-4">☕ Map coming soon</div>
+
+  <!-- USERS -->
+  <div class="row mt-4" id="userList"></div>
+
+</div>
+
+<script src="js/explore.js"></script>
+
+</body>
+</html>
