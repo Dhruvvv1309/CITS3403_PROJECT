@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Journal</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+  <h2 id="username"></h2>
+
+  <div id="journalEntries"></div>
+
+  <!-- COMMENTS -->
+  <div class="mt-4">
+    <h4>Comments</h4>
+
+    <div id="commentsList"></div>
+
+    <textarea id="commentInput" class="form-control"></textarea>
+    <button onclick="addComment()" class="btn btn-success mt-2">Post</button>
+  </div>
+
+</div>
+
+<script src="js/comments.js"></script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const user = params.get("user");
+
+document.getElementById("username").innerText = user + "'s Coffee Journal";
+
+const entries = [
+  { cafe: "Starbucks", type: "Latte", rating: 4 },
+  { cafe: "Local Cafe", type: "Espresso", rating: 5 }
+];
+
+const journal = document.getElementById("journalEntries");
+
+entries.forEach(e => {
+  journal.innerHTML += `
+    <div class="card mb-2">
+      <div class="card-body">
+        <h5>${e.cafe}</h5>
+        <p>${e.type} | ⭐ ${e.rating}</p>
+      </div>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
