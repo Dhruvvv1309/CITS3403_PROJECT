@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,11 +15,12 @@ body {
 
 /* NAVBAR */
 .top-nav {
-  background: #2C1A0E;
+  background: #352010;
   padding: 0.9rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 0.5px solid #d4b896;
 }
 
 .brand {
@@ -51,6 +51,11 @@ body {
 
 .nav-links a:hover {
   color: #F2EDE4;
+}
+
+.nav-links a.active {
+  color: #C47F3C;
+  font-weight: 500;
 }
 
 /* SIGNUP CONTAINER */
@@ -96,15 +101,19 @@ body {
   padding: 10px 14px;
   font-size: 0.9rem;
   background-color: #fff;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  color: #2C1A0E;
 }
 
 .form-control:focus {
   border-color: #C47F3C;
   box-shadow: 0 0 0 3px rgba(196, 127, 60, 0.15);
+  outline: none;
 }
 
 .btn-signup {
-  background-color: #2C1A0E;
+  background-color: #352010;
   color: #C47F3C;
   border: none;
   border-radius: 8px;
@@ -112,6 +121,8 @@ body {
   font-size: 0.95rem;
   font-weight: 500;
   font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-signup:hover {
@@ -129,6 +140,23 @@ body {
   color: #2C1A0E;
 }
 
+/* ERROR MESSAGE */
+.error-msg {
+  display: none;
+  background-color: #fde8e8;
+  color: #922;
+  border: 1px solid #f5c6c6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-msg.show {
+  display: block;
+}
+
 /* FOOTER */
 footer {
   background: #2C1A0E;
@@ -137,4 +165,3 @@ footer {
   padding: 1.2rem 0;
   text-align: center;
 }
-
