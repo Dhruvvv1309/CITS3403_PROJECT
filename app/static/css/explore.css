@@ -1,0 +1,97 @@
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: #F2EDE4;
+  color: #2C1A0E;
+}
+
+/* NAVBAR */
+.top-nav {
+  background: #2C1A0E;
+  padding: 0.9rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-size: 1.4rem;
+  color: #F2EDE4;
+  text-decoration: none;
+}
+
+.brand span {
+  color: #C47F3C;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #c8b99a;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: #F2EDE4;
+}
+
+/* PAGE */
+.page-container {
+  padding: 2rem;
+}
+
+.subtitle {
+  color: #7a6550;
+  margin-bottom: 1.5rem;
+}
+
+/* SEARCH */
+.search-bar {
+  border-radius: 8px;
+  border: 1px solid #d4b896;
+  background-color: #FAF7F2;
+}
+
+/* MAP */
+#map {
+  height: 200px;
+  background-color: #e8e2d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #7a6550;
+}
+
+/* CARDS */
+.card {
+  border-radius: 12px;
+  background-color: #FAF7F2;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card h5 {
+  color: #2C1A0E;
+}
+
+.card p {
+  color: #7a6550;
+}
+
+.btn-primary {
+  background-color: #2C1A0E;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3d2510;
+}
