@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"> <!--language set to English-->
+<head>
+  <meta charset="UTF-8" /> <!--character encoding for emoji support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!--functional for phone-->
+  <title>Log a Coffee – cuplog</title> <!--title of the page -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/> <!--bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/> <!--google fonts-->
+  <link rel="stylesheet" href="log-coffee.css"/> <!--external style sheet -->
+</head>
+
+<body>
+    <nav class="top-nav"> <!--Navigation bar-->
+        <a class="brand" href="#"><span>cup</span>log</a> <!--logo-->
+        <ul class="nav-links"> <!--Each link in the nav bar-->
+            <li><a href="#">My journal</a></li>
+            <li><a href="#" class="active">Log a coffee</a></li>
+            <li><a href="#">Community</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-wrapper"> <!--Wrapper for the whole page content-->
+        <!-- Left side of page -->
+        <div class="left-panel">
+            <h1 class="brand-name">What are you<br>drinking today?</h1>
+            <p class="brand-desc">Track what you're drinking, where you had it, and what you thought of it.</p>
+        </div>
+        <!-- Right side of page -->
+        <div class="right-panel">
+            <div class="log-card"> <!--Card for logging a coffee-->
+                <h2 class="card-title">Log a new coffee</h2>
+                <p class="card-sub">Fill in the details of your drink</p>
+                <div class="mb-3"> 
+                    <label class="form-label" for="cafeName">Cafe name</label>
+                    <input type="text" class="form-control" id="cafeName" placeholder="e.g. Zonts Bakehouse..."/>
+                </div>
+
+                <div class="mb-3">
+                    <!--dropdown menu for coffee type-->
+                    <label class="form-label" for="coffeeType">Coffee type</label> 
+                    <select class="form-control" id="coffeeType">
+                        <option value="" disabled selected>Select a type…</option> 
+                        <option>Espresso</option>
+                        <option>Flat White</option>
+                        <option>Latte</option>
+                        <option>Cappuccino</option>
+                        <option>Long Black</option>
+                        <option>Cortado</option>
+                        <option>Cold Brew</option>
+                        <option>Pour Over</option>
+                        <option>Matcha</option>
+                        <option>Other</option>
+                    </select>
+                    <!--text input for 'other' option, hidden by default-->
+                    <input type="text" class="form-control mt-2" id="otherType" placeholder="Type your drink…" style="display:none;"/> 
+                </div> 
+                <div class="mb-3">
+                    <!--star rating system-->
+                    <label class="form-label">Rating</label>
+                    <div class="star-rating" id="starRating">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <input type="hidden" id="ratingValue" value="0"/>
+                    <p class="rating-label" id="ratingLabel">Tap to rate</p>
+                </div>
+                <div class="mb-4">
+                    <!--text area for additional notes-->
+                    <label class="form-label" for="notes">Notes:</label>
+                    <textarea class="form-control" id="notes" rows="3" placeholder="Any comments?"></textarea>
+                </div>
+                <button class="btn btn-log w-100" id="submitBtn">Save to journal</button> <!--save button-->  
+                <div class="success-msg" id="successMsg">
+                    Coffee logged! It's been added to your journal.
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        cuplog · CITS5505 Group Project 2026
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> <!--bootstrap js -->
+    <script src="log-coffee.js"></script> <!--external js file -->
+</body>
+</html>

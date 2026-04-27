@@ -1,0 +1,228 @@
+* { /*Apply box-sizing to all elements*/
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #F2EDE4;
+    color: #2C1A0E;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* Navigation bar */
+.top-nav {
+    background: #352010;
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid #d4b896;
+    
+}
+
+.brand {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #F2EDE4;
+    text-decoration: none;
+}
+
+.brand span {
+    color: #C47F3C;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #c8b99a;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+    color: #F2EDE4;
+}
+
+.nav-links a.active {
+    color: #C47F3C;
+    font-weight: 500;
+}
+/* Page layout */
+.page-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 110px); /*Ensure it fills the remaining height after the nav bar*/
+    background-color: #2C1A0E;
+}
+
+/* Left panel */
+.left-panel {
+    flex: 1;
+    background-color: #2C1A0E;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 3rem;
+}
+
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #C47F3C;
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+}
+
+.brand-desc {
+    font-size: 0.95rem;
+    color: #c8b99a;
+    line-height: 1.8;
+    max-width: 360px;
+}
+
+/* Right panel */
+.right-panel {
+    width: 480px;
+    background-color: #F2EDE4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 1.5rem;
+}
+
+/* Log card */
+.log-card {
+    width: 100%;
+    max-width: 380px;
+}
+
+.card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #2C1A0E;
+    margin-bottom: 0.3rem;
+}
+
+.card-sub {
+    font-size: 0.9rem;
+    color: #7a6550;
+    margin-bottom: 1.5rem;
+}
+
+/* Form fields */
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2C1A0E;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.form-control {
+    border: 1px solid #d4b896;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    background-color: #FAF7F2;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    color: #2C1A0E;
+}
+
+.form-control:focus {
+    border-color: #C47F3C;
+    box-shadow: 0 0 0 3px rgba(196, 127, 60, 0.15);
+    outline: none;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 90px;
+}
+/* Star rating */
+.star-rating {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.star {
+    font-size: 1.8rem;
+    color: #d4b896;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.1s ease;
+    line-height: 1;
+}
+
+.star:hover,
+.star.filled {
+    color: #C47F3C;
+}
+
+.star:hover {
+    transform: scale(1.15);
+}
+
+.rating-label {
+    font-size: 0.8rem;
+    color: #9C8469;
+    margin-top: 0.2rem;
+}
+
+/* Submit button */
+.btn-log {
+    background-color: #352010;
+    color: #C47F3C;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-log:hover {
+    background-color: #3d2510;
+    color: #e8b86d;
+}
+
+/* Footer */
+footer {
+    background: #2C1A0E;
+    color: #7a6550;
+    font-size: 0.8rem;
+    padding: 1.2rem 0;
+    text-align: center;
+}
+
+/* Success message */
+.success-msg {
+    display: none;
+    margin-top: 1rem;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    text-align: center;
+}
+
+.success-msg.show {
+    display: block;
+}
