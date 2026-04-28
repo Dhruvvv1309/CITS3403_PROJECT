@@ -95,3 +95,33 @@ body {
 .btn-primary:hover {
   background-color: #3d2510;
 }
+
+.subtitle {
+  color: #7a6550;
+  margin-bottom: 1.5rem;
+}
+
+#matchResults .card {
+  background-color: #fff7ec;
+}
+
+.card {
+  border-radius: 12px;
+  background-color: #FAF7F2;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.btn-primary {
+  background-color: #2C1A0E;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3d2510;
+}
