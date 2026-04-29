@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<html lang="en"> <!--language set to English-->
-<head>
-  <meta charset="UTF-8" /> <!--character encoding for emoji support -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!--functional for phone-->
-  <title>Log a Coffee – cuplog</title> <!--title of the page -->
+{% extends 'base.html' %}
+{% block title %}Log a Coffee – cuplog{% endblock %}
 
+{% block styles %}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/> <!--bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/> <!--google fonts-->
-  <link rel="stylesheet" href="/static/css/log-coffee.css"/> <!--external style sheet -->
-</head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/log-coffee.css') }}"/> <!--external style sheet -->
+{% endblock %}
 
-<body>
-    <nav class="top-nav"> <!--Navigation bar-->
-        <a class="brand" href="#"><span>cup</span>log</a> <!--logo-->
-        <ul class="nav-links"> <!--Each link in the nav bar-->
-            <li><a href="#">My journal</a></li>
-            <li><a href="#" class="active">Log a coffee</a></li>
-            <li><a href="#">Community</a></li>
-        </ul>
-    </nav>
-
+{% block content %}
     <div class="page-wrapper"> <!--Wrapper for the whole page content-->
         <!-- Left side of page -->
         <div class="left-panel">
@@ -83,7 +71,8 @@
     <footer>
         cuplog · CITS5505 Group Project 2026
     </footer>
+{% endblock %}
+{% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> <!--bootstrap js -->
-    <script src="/static/js/log-coffee.js"></script> <!--external js file -->
-</body>
-</html>
+    <script src="{{ url_for('static', filename='js/log-coffee.js') }}"></script>
+{% endblock %}
