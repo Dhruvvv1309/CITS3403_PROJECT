@@ -1,0 +1,259 @@
+* { /* Apply box-sizing to all elements */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #F2EDE4;
+    color: #2C1A0E;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navigation bar */
+.top-nav {
+    background: #352010;
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid #d4b896;
+}
+
+.brand {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #F2EDE4;
+    text-decoration: none;
+}
+
+.brand span {
+    color: #C47F3C;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #c8b99a;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+    color: #F2EDE4;
+}
+
+.nav-links a.active {
+    color: #C47F3C;
+    font-weight: 500;
+}
+
+.nav-user {
+    background: #C47F3C;
+    color: #F2EDE4;
+    border: none;
+    border-radius: 50px;
+    padding: 0.45rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+}
+
+.nav-user:hover {
+    background: #a86830;
+}
+
+/* Hero section */
+.hero {
+    background: #2C1A0E;
+    padding: 2.5rem 2rem 2rem;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #F2EDE4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2C1A0E;
+    flex-shrink: 0;
+}
+
+.hero-info {
+    flex: 1;
+}
+
+.hero-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #F2EDE4;
+    margin-bottom: 0.2rem;
+}
+
+.hero-sub {
+    color: #c8b99a;
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+}
+
+.badge-pill {
+    display: inline-block;
+    border: 1.5px solid #c8b99a;
+    color: #F2EDE4;
+    border-radius: 50px;
+    padding: 0.25rem 0.9rem;
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
+}
+
+.badge-pill.gold {
+    border-color: #C47F3C;
+    color: #C47F3C;
+}
+
+.btn-follow {
+    background: #C47F3C;
+    color: #F2EDE4;
+    border: none;
+    border-radius: 50px;
+    padding: 0.5rem 1.6rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-follow:hover {
+    background: #a86830;
+}
+
+/* Stats row */
+.stats-section {
+    max-width: 900px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-card {
+    flex: 1;
+    background: #EAE4DA;
+    border-radius: 12px;
+    padding: 1.4rem 1rem;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2C1A0E;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #7a6550;
+    margin-top: 0.2rem;
+}
+
+/* Journal section */
+.journal-section {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    padding: 0 1rem;
+}
+
+.journal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2C1A0E;
+    margin-bottom: 1rem;
+}
+
+/* Entry card */
+.entry-card {
+    background: #FAF7F2;
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.entry-main {
+    flex: 1;
+}
+
+.entry-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2C1A0E;
+    margin-bottom: 0.2rem;
+}
+
+.entry-meta {
+    font-size: 0.82rem;
+    color: #9C8469;
+    margin-bottom: 0.4rem;
+}
+
+.entry-stars {
+    color: #C47F3C;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.entry-note {
+    font-size: 0.88rem;
+    color: #5a4535;
+    line-height: 1.5;
+}
+
+.entry-photo {
+    width: 90px;
+    height: 80px;
+    background: #E0D8CC;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #9C8469;
+    flex-shrink: 0;
+}
+
+/* Footer */
+footer {
+    background: #2C1A0E;
+    color: #7a6550;
+    font-size: 0.8rem;
+    padding: 1.2rem 0;
+    text-align: center;
+}
