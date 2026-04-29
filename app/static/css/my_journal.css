@@ -151,40 +151,10 @@ body {
     background: #a86830;
 }
 
-/* Stats row */
-.stats-section {
-    max-width: 900px;
-    margin: 1.5rem auto;
-    padding: 0 1rem;
-    display: flex;
-    gap: 1rem;
-}
-
-.stat-card {
-    flex: 1;
-    background: #EAE4DA;
-    border-radius: 12px;
-    padding: 1.4rem 1rem;
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2C1A0E;
-    display: block;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: #7a6550;
-    margin-top: 0.2rem;
-}
-
 /* Journal section */
 .journal-section {
     max-width: 900px;
-    margin: 0 auto 3rem;
+    margin: 2rem auto 3rem;
     padding: 0 1rem;
 }
 
