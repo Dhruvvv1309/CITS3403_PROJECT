@@ -1,100 +1,81 @@
-<!DOCTYPE html>
-<html lang="en"> <!--language set to English-->
-<head>
-  <meta charset="UTF-8" /> <!--character encoding for emoji support-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!--functional for phone-->
-  <title>My Journal – cuplog</title> <!--title of the page-->
+{% extends 'base.html' %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/> <!--bootstrap-->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/> <!--google fonts-->
-  <link rel="stylesheet" href="my_journal.css"/> <!--external style sheet-->
-</head>
+{% block title %}My Journal – cuplog{% endblock %}
 
-<body>
+{% block styles %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/my_journal.css') }}"/>
+{% endblock %}
 
-  <!-- Navigation bar -->
-  <nav class="top-nav">
-    <a class="brand" href="#"><span>cup</span>log</a> <!--logo-->
-    <ul class="nav-links"> <!--Each link in the nav bar-->
-      <li><a href="#" class="active">My journal</a></li>
-      <li><a href="#">Log a coffee</a></li>
-      <li><a href="#">Community</a></li>
-    </ul>
-    <button class="nav-user">@winston</button>
-  </nav>
+{% block content %}
 
-  <!-- Hero section -->
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="avatar">WC</div>
-      <div class="hero-info">
-        <div class="hero-name">Winston C.</div>
-        <div class="hero-sub">Espresso lover · Perth</div>
-        <div>
-          <span class="badge-pill">42 coffees</span>
-          <span class="badge-pill gold">Flat white regular</span>
-          <span class="badge-pill">Explorer</span>
-        </div>
+<!-- Hero section -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="avatar">WC</div>
+
+    <div class="hero-info">
+      <div class="hero-name">Winston C.</div>
+      <div class="hero-sub">Espresso lover · Perth</div>
+      <div>
+        <span class="badge-pill">42 coffees</span>
+        <span class="badge-pill gold">Flat white regular</span>
+        <span class="badge-pill">Explorer</span>
       </div>
-      <button class="btn-follow">Follow</button>
-    </div>
-  </section>
-
-  <!-- Journal entries -->
-  <section class="journal-section">
-    <div class="journal-title">Winston's journal</div>
-
-    <!-- Entry 1 -->
-    <div class="entry-card">
-      <div class="entry-main">
-        <div class="entry-name">Magic Latte</div>
-        <div class="entry-meta">Latte · Sideshow Espresso, Northbridge · yesterday</div>
-        <div class="entry-stars">★★★★★</div>
-        <p class="entry-note">Incredibly silky texture with a sweet almond finish. Almost too pretty to drink.</p>
-      </div>
-      <div class="entry-photo">photo</div>
     </div>
 
-    <!-- Entry 2 -->
-    <div class="entry-card">
-      <div class="entry-main">
-        <div class="entry-name">Single Origin Espresso</div>
-        <div class="entry-meta">Espresso · Telegram Coffee, CBD · 3 days ago</div>
-        <div class="entry-stars">★★★★½</div>
-        <p class="entry-note">Ethiopian Yirgacheffe — bright berry notes, clean chocolate finish.</p>
-      </div>
-      <div class="entry-photo">photo</div>
+    <button class="btn-follow">Follow</button>
+  </div>
+</section>
+
+<!-- Journal entries -->
+<section class="journal-section">
+  <div class="journal-title">Winston's journal</div>
+
+  <!-- Entry 1 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Magic Latte</div>
+      <div class="entry-meta">Latte · Sideshow Espresso, Northbridge · yesterday</div>
+      <div class="entry-stars">★★★★★</div>
+      <p class="entry-note">Incredibly silky texture with a sweet almond finish. Almost too pretty to drink.</p>
     </div>
+    <div class="entry-photo">photo</div>
+  </div>
 
-    <!-- Entry 3 -->
-    <div class="entry-card">
-      <div class="entry-main">
-        <div class="entry-name">Cold Brew Tonic</div>
-        <div class="entry-meta">Cold brew · Humblebee, Leederville · 5 days ago</div>
-        <div class="entry-stars">★★★★☆</div>
-        <p class="entry-note">Refreshing with tonic cutting through the bitterness. Great on a hot day.</p>
-      </div>
-      <div class="entry-photo">photo</div>
+  <!-- Entry 2 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Single Origin Espresso</div>
+      <div class="entry-meta">Espresso · Telegram Coffee, CBD · 3 days ago</div>
+      <div class="entry-stars">★★★★½</div>
+      <p class="entry-note">Ethiopian Yirgacheffe — bright berry notes, clean chocolate finish.</p>
     </div>
+    <div class="entry-photo">photo</div>
+  </div>
 
-    <!-- Entry 4 -->
-    <div class="entry-card">
-      <div class="entry-main">
-        <div class="entry-name">V60 Pour Over</div>
-        <div class="entry-meta">Pour over · Strange Company, Fremantle · 1 week ago</div>
-        <div class="entry-stars">★★★★★</div>
-        <p class="entry-note">Beautifully balanced. Floral jasmine notes with a honey sweetness.</p>
-      </div>
-      <div class="entry-photo">photo</div>
+  <!-- Entry 3 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">Cold Brew Tonic</div>
+      <div class="entry-meta">Cold brew · Humblebee, Leederville · 5 days ago</div>
+      <div class="entry-stars">★★★★☆</div>
+      <p class="entry-note">Refreshing with tonic cutting through the bitterness. Great on a hot day.</p>
     </div>
+    <div class="entry-photo">photo</div>
+  </div>
 
-  </section>
+  <!-- Entry 4 -->
+  <div class="entry-card">
+    <div class="entry-main">
+      <div class="entry-name">V60 Pour Over</div>
+      <div class="entry-meta">Pour over · Strange Company, Fremantle · 1 week ago</div>
+      <div class="entry-stars">★★★★★</div>
+      <p class="entry-note">Beautifully balanced. Floral jasmine notes with a honey sweetness.</p>
+    </div>
+    <div class="entry-photo">photo</div>
+  </div>
 
-  <!-- Footer -->
-  <footer>
-    cuplog · CITS5505 Group Project 2026
-  </footer>
+</section>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> <!--bootstrap js-->
-</body>
-</html>
+{% endblock %}
