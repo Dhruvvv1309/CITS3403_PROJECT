@@ -13,15 +13,18 @@
     <nav class="top-nav">
         <a class="brand" href="{{ url_for('home') }}"><span>cup</span>log</a>
         <ul class="nav-links"> <!-- Add navigation links here -->
-            <li><a href="{{ url_for('my_journal') }}">My Journal</a></li>
-            <li><a href="{{ url_for('log_coffee') }}">Log a Coffee</a></li>
-            <li><a href="{{ url_for('explore') }}">Explore</a></li>
+            <li><a href="{{ url_for('my_journal') }}" class="{{ 'active' if request.endpoint == 'my_journal' else '' }}">My Journal</a></li>
+            <li><a href="{{ url_for('log_coffee') }}" class="{{ 'active' if request.endpoint == 'log_coffee' else '' }}">Log a Coffee</a></li>
+            <li><a href="{{ url_for('explore') }}" class="{{ 'active' if request.endpoint == 'explore' else '' }}">Explore</a></li>
         </ul>
     </nav>
 <!-- Main content area of each page that extends the base template -->
     <main>
         {% block content %}{% endblock %}
     </main>
+     <footer>
+        cuplog · CITS3403/CITS5505 Group Project 2026
+    </footer>
 
     {% block scripts %}{% endblock %}
 </body>
