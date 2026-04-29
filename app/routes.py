@@ -13,9 +13,9 @@ def explore():
 def signup():
     return render_template('signup.html')
 
-@app.route('/user')
-def user():
-    return render_template('user.html')
+@app.route('/my_journal')
+def my_journal():
+    return render_template('my_journal.html')
 
 @app.route('/log-coffee')
 def log_coffee():

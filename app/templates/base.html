@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}cuplog{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+
+    <nav class="top-nav">
+        <a class="brand" href="{{ url_for('home') }}"><span>cup</span>log</a>
+        <ul class="nav-links"> <!-- Add navigation links here -->
+            <li><a href="{{ url_for('my_journal') }}">My Journal</a></li>
+            <li><a href="{{ url_for('log_coffee') }}">Log a Coffee</a></li>
+            <li><a href="{{ url_for('explore') }}">Explore</a></li>
+        </ul>
+    </nav>
+<!-- Main content area of each page that extends the base template -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
