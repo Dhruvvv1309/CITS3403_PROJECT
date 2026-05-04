@@ -20,27 +20,16 @@
                 <h2 class="card-title">Log a new coffee</h2>
                 <p class="card-sub">Fill in the details of your drink</p>
 <!-- Cafe name, coffee type, rating, photo, notes -->
+            <form name="log_coffee" action="" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
                 <div class="form-grid">
                     <div class="mb-3">
                         <label class="form-label" for="cafeName">Cafe name</label>
-                        <input type="text" class="form-control" id="cafeName" placeholder="e.g. Zonts Bakehouse..."/>
+                        {{ form.cafe_name(class="form-control", id="cafeName", placeholder="e.g. Zonts Bakehouse...") }}
                     </div>
                     <div class="mb-3"> <!-- Coffee type dropdown -->
                         <label class="form-label" for="coffeeType">Coffee type</label>
-                        <select class="form-control" id="coffeeType">
-                            <option value="" disabled selected>Select a type…</option>
-                            <option>Espresso</option>
-                            <option>Flat White</option>
-                            <option>Latte</option>
-                            <option>Cappuccino</option>
-                            <option>Long Black</option>
-                            <option>Cortado</option>
-                            <option>Cold Brew</option>
-                            <option>Pour Over</option>
-                            <option>Matcha</option>
-                            <option>Other</option>
-                        </select>
-                        <input type="text" class="form-control mt-2" id="otherType" placeholder="Type your drink…" style="display:none;"/>
+                        {{ form.coffee_type(class="form-control", id="coffeeType") }}
                     </div>
                 </div>
 <!-- Star rating system -->
@@ -53,24 +42,21 @@
                         <span class="star" data-value="4">★</span>
                         <span class="star" data-value="5">★</span>
                     </div>
-                    <input type="hidden" id="ratingValue" value="0"/>
+                    {{ form.rating(id="ratingValue", type="hidden") }}
                     <p class="rating-label" id="ratingLabel">Tap to rate</p>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="coffeeImage">Add a photo</label>
-                    <input type="file" class="form-control" id="coffeeImage" accept="image/*"/>
+                    <label class="form-label">Add a photo</label>
+                    {{ form.photo(class="form-control", accept="image/*") }}
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label" for="notes">Notes</label>
-                    <textarea class="form-control" id="notes" rows="3" placeholder="Any comments?"></textarea>
+                    {{ form.notes(class="form-control", rows="3", placeholder="Any comments?") }}
                 </div>
-
-                <button class="btn btn-log w-100" id="submitBtn">Save to journal</button>
-                <div class="success-msg" id="successMsg">
-                    Coffee logged! It's been added to your journal.
-                </div>
+                {{ form.submit(class="btn btn-log w-100") }}
+            </form>
             </div>
         </div>
     </div>
