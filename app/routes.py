@@ -20,3 +20,7 @@ def my_journal():
 @app.route('/log-coffee')
 def log_coffee():
     return render_template('log-coffee.html')
+
+@app.route('/game')
+def game():
+    return render_template('game.html')
