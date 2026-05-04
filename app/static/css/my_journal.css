@@ -95,6 +95,25 @@ body {
     margin-bottom: 1rem;
 }
 
+.flash-message,
+.journal-notice,
+.empty-journal {
+    background: #FAF7F2;
+    border-radius: 12px;
+    color: #5a4535;
+    font-size: 0.88rem;
+    margin-bottom: 0.9rem;
+    padding: 0.9rem 1rem;
+}
+
+.flash-message {
+    border-left: 4px solid #C47F3C;
+}
+
+.journal-notice {
+    color: #9C8469;
+}
+
 /* Entry card */
 .entry-card {
     background: #FAF7F2;
@@ -169,6 +188,10 @@ body {
     font-size: 0.75rem;
     color: #9C8469;
     flex-shrink: 0;
+}
+
+.entry-photo-img {
+    object-fit: cover;
 }
 
 .entry-details {
