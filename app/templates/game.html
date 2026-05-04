@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Coffee Crafter · cuplog{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-wrapper">
+  <div class="game-header">
+    <h1>☕ Coffee Crafter</h1>
+    <p>Pick your ingredients and discover what coffee you can make!</p>
+  </div>
+
+  <div class="game-area">
+    <div class="ingredients-panel">
+      <h2>Ingredients</h2>
+      <div class="ingredients-grid">
+        <div class="ingredient" data-id="espresso">☕ Espresso</div>
+        <div class="ingredient" data-id="steamed_milk">🥛 Steamed Milk</div>
+        <div class="ingredient" data-id="milk_foam">🫧 Milk Foam</div>
+        <div class="ingredient" data-id="hot_water">💧 Hot Water</div>
+        <div class="ingredient" data-id="whipped_cream">🍦 Whipped Cream</div>
+        <div class="ingredient" data-id="chocolate">🍫 Chocolate</div>
+        <div class="ingredient" data-id="cold_milk">🧊 Cold Milk</div>
+        <div class="ingredient" data-id="ice">🧊 Ice</div>
+      </div>
+    </div>
+
+    <div class="mixing-panel">
+      <h2>Your Mix</h2>
+      <div class="mix-zone" id="mixZone">
+        <p class="mix-hint">Click ingredients to add them here</p>
+      </div>
+      <div class="mix-actions">
+        <button class="btn-brew" id="brewBtn">Brew It! ☕</button>
+        <button class="btn-clear" id="clearBtn">Clear</button>
+      </div>
+    </div>
+
+    <div class="result-panel" id="resultPanel">
+      <div class="result-card" id="resultCard">
+        <div class="result-emoji" id="resultEmoji">☕</div>
+        <h2 id="resultName">—</h2>
+        <p id="resultDesc">—</p>
+        <div class="result-recipe" id="resultRecipe"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="collection-area">
+    <h2>☕ Your Coffee Collection</h2>
+    <div class="collection-grid" id="collectionGrid"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}
