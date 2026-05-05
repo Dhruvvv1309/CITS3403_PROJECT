@@ -32,50 +32,68 @@
 <section class="journal-section">
   <div class="journal-title">Winston's journal</div>
 
-  <!-- Entry 1 -->
-  <div class="entry-card">
-    <div class="entry-main">
-      <div class="entry-name">Magic Latte</div>
-      <div class="entry-meta">Latte · Sideshow Espresso, Northbridge · yesterday</div>
-      <div class="entry-stars">★★★★★</div>
-      <p class="entry-note">Incredibly silky texture with a sweet almond finish. Almost too pretty to drink.</p>
-    </div>
-    <div class="entry-photo">photo</div>
-  </div>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash-message">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-  <!-- Entry 2 -->
-  <div class="entry-card">
-    <div class="entry-main">
-      <div class="entry-name">Single Origin Espresso</div>
-      <div class="entry-meta">Espresso · Telegram Coffee, CBD · 3 days ago</div>
-      <div class="entry-stars">★★★★½</div>
-      <p class="entry-note">Ethiopian Yirgacheffe — bright berry notes, clean chocolate finish.</p>
-    </div>
-    <div class="entry-photo">photo</div>
-  </div>
+  {% if using_fallback %}
+    <div class="journal-notice">Showing sample journal entries until the coffee log database is ready.</div>
+  {% endif %}
 
-  <!-- Entry 3 -->
-  <div class="entry-card">
-    <div class="entry-main">
-      <div class="entry-name">Cold Brew Tonic</div>
-      <div class="entry-meta">Cold brew · Humblebee, Leederville · 5 days ago</div>
-      <div class="entry-stars">★★★★☆</div>
-      <p class="entry-note">Refreshing with tonic cutting through the bitterness. Great on a hot day.</p>
-    </div>
-    <div class="entry-photo">photo</div>
-  </div>
-
-  <!-- Entry 4 -->
-  <div class="entry-card">
-    <div class="entry-main">
-      <div class="entry-name">V60 Pour Over</div>
-      <div class="entry-meta">Pour over · Strange Company, Fremantle · 1 week ago</div>
-      <div class="entry-stars">★★★★★</div>
-      <p class="entry-note">Beautifully balanced. Floral jasmine notes with a honey sweetness.</p>
-    </div>
-    <div class="entry-photo">photo</div>
-  </div>
+  {% if entries %}
+    {% for entry in entries %}
+      <div class="entry-card">
+        <div class="entry-summary">
+          <div class="entry-main">
+            <div class="entry-name">{{ entry.title }}</div>
+            <div class="entry-meta">{{ entry.coffee_type }} · {{ entry.cafe_name }} · {{ entry.date_display }}</div>
+            <div class="entry-stars">{{ entry.stars }}</div>
+            <p class="entry-note">{{ entry.notes }}</p>
+            <button class="details-toggle" type="button" aria-expanded="false" aria-controls="entry-details-{{ loop.index }}">
+              View details
+            </button>
+          </div>
+          {% if entry.photo_path %}
+            <img class="entry-photo entry-photo-img" src="{{ url_for('static', filename=entry.photo_path) }}" alt="{{ entry.title }} photo"/>
+          {% else %}
+            <div class="entry-photo">photo</div>
+          {% endif %}
+        </div>
+        <div class="entry-details" id="entry-details-{{ loop.index }}" hidden>
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label">Cafe</span>
+              <span class="detail-value">{{ entry.cafe_name }}</span>
+            </div>
+            <div>
+              <span class="detail-label">Coffee</span>
+              <span class="detail-value">{{ entry.coffee_type }}</span>
+            </div>
+            <div>
+              <span class="detail-label">Rating</span>
+              <span class="detail-value">{{ entry.rating }}/5</span>
+            </div>
+            <div>
+              <span class="detail-label">Date</span>
+              <span class="detail-value">{{ entry.date_display }}</span>
+            </div>
+          </div>
+          <p class="detail-note">{{ entry.notes }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-journal">No coffee logs yet.</div>
+  {% endif %}
 
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/my_journal.js') }}"></script>
 {% endblock %}
