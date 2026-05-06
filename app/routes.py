@@ -1,8 +1,9 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for, request
+from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
-from app.forms import CoffeeLogForm
+from app.forms import CoffeeLogForm, LoginForm, SignupForm
 import os
-from app.models import CoffeeLog
+from app.models import CoffeeLog, User
 
 def _rating_stars(rating):
     rating = int(rating or 0)
@@ -74,19 +75,46 @@ def _journal_entry_from_log(log):
         'date_display': log.date_logged.strftime('%d %b %Y') if log.date_logged else 'No date',
     }
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('my_journal'))
+        flash('Invalid email or password')
+    return render_template('login.html', form=form)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('Email already registered. Please log in.')
+            return redirect(url_for('home'))
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        return redirect(url_for('my_journal'))
+    return render_template('signup.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 @app.route('/explore')
+@login_required
 def explore():
     return render_template('Explore.html')
 
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')
-
 @app.route('/my_journal')
+@login_required
 def my_journal():
     using_fallback = False
     try:
@@ -96,10 +124,10 @@ def my_journal():
         db.session.rollback()
         entries = _fallback_journal_entries()
         using_fallback = True
-
     return render_template('my_journal.html', entries=entries, using_fallback=using_fallback)
 
 @app.route('/log-coffee', methods=['GET', 'POST'])
+@login_required
 def log_coffee():
     form = CoffeeLogForm()
     if form.validate_on_submit():
