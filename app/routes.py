@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, jsonify, redirect, render_template, request, url_for
 from app import app, db
 from app.forms import CoffeeLogForm
 import os
@@ -19,6 +19,7 @@ def _fallback_journal_entries():
             'title': 'Magic Latte',
             'cafe_name': 'Sideshow Espresso',
             'coffee_type': 'Latte',
+            'coffee_type_value': 'latte',
             'rating': 5,
             'stars': '★★★★★',
             'photo_path': None,
@@ -30,6 +31,7 @@ def _fallback_journal_entries():
             'title': 'Single Origin Espresso',
             'cafe_name': 'Telegram Coffee',
             'coffee_type': 'Espresso',
+            'coffee_type_value': 'espresso',
             'rating': 4,
             'stars': '★★★★☆',
             'photo_path': None,
@@ -41,6 +43,7 @@ def _fallback_journal_entries():
             'title': 'Cold Brew Tonic',
             'cafe_name': 'Humblebee',
             'coffee_type': 'Cold Brew',
+            'coffee_type_value': 'cold_brew',
             'rating': 4,
             'stars': '★★★★☆',
             'photo_path': None,
@@ -52,6 +55,7 @@ def _fallback_journal_entries():
             'title': 'V60 Pour Over',
             'cafe_name': 'Strange Company',
             'coffee_type': 'Pour Over',
+            'coffee_type_value': 'pour_over',
             'rating': 5,
             'stars': '★★★★★',
             'photo_path': None,
@@ -67,12 +71,16 @@ def _journal_entry_from_log(log):
         'title': coffee_type,
         'cafe_name': log.cafe_name,
         'coffee_type': coffee_type,
+        'coffee_type_value': log.coffee_type,
         'rating': log.rating,
         'stars': _rating_stars(log.rating),
         'photo_path': log.photo_path,
         'notes': log.notes or 'No notes added yet.',
         'date_display': log.date_logged.strftime('%d %b %Y') if log.date_logged else 'No date',
     }
+
+def _entry_count():
+    return CoffeeLog.query.count()
 
 @app.route('/')
 def home():
@@ -92,12 +100,51 @@ def my_journal():
     try:
         coffee_logs = CoffeeLog.query.order_by(CoffeeLog.date_logged.desc()).all()
         entries = [_journal_entry_from_log(log) for log in coffee_logs]
+        entry_count = len(entries)
     except Exception:
         db.session.rollback()
         entries = _fallback_journal_entries()
+        entry_count = len(entries)
         using_fallback = True
 
-    return render_template('my_journal.html', entries=entries, using_fallback=using_fallback)
+    return render_template('my_journal.html', entries=entries, entry_count=entry_count, using_fallback=using_fallback)
+
+@app.route('/my_journal/<int:entry_id>/edit', methods=['POST'])
+def edit_journal_entry(entry_id):
+    entry = CoffeeLog.query.get(entry_id)
+    if entry is None:
+        return jsonify({'success': False, 'error': 'Entry not found.'}), 404
+
+    data = request.get_json() or {}
+    cafe_name = (data.get('cafe_name') or '').strip()
+    coffee_type = (data.get('coffee_type') or '').strip()
+
+    try:
+        rating = int(data.get('rating', entry.rating))
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'Rating must be a number.'}), 400
+
+    if not cafe_name or not coffee_type or rating < 1 or rating > 5:
+        return jsonify({'success': False, 'error': 'Please enter a cafe, coffee type, and rating from 1 to 5.'}), 400
+
+    entry.cafe_name = cafe_name
+    entry.coffee_type = coffee_type
+    entry.rating = rating
+    entry.notes = data.get('notes', entry.notes)
+    db.session.commit()
+
+    return jsonify({'success': True, 'entry': _journal_entry_from_log(entry)})
+
+@app.route('/my_journal/<int:entry_id>/delete', methods=['POST'])
+def delete_journal_entry(entry_id):
+    entry = CoffeeLog.query.get(entry_id)
+    if entry is None:
+        return jsonify({'success': False, 'error': 'Entry not found.'}), 404
+
+    db.session.delete(entry)
+    db.session.commit()
+
+    return jsonify({'success': True, 'entry_count': _entry_count()})
 
 @app.route('/log-coffee', methods=['GET', 'POST'])
 def log_coffee():
