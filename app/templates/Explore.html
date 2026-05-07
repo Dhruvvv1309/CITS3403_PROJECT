@@ -1,44 +1,108 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Explore</title>
+{% extends 'base.html' %}
 
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&family=Playfair+Display&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css">
-</head>
+{% block title %}Explore{% endblock %}
 
-<body>
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/explore.css') }}">
+{% endblock %}
 
-<!-- NAVBAR -->
-<div class="top-nav">
-  <a href="explore.html" class="brand">Cup<span>Log</span></a>
+{% block content %}
 
-  <ul class="nav-links">
-    <li><a href="explore.html">Explore</a></li>
-    <li><a href="journal.html">My Journal</a></li>
-    <li><a href="login.html">Logout</a></li>
-  </ul>
+<div class="explore-hero">
+  <h1>Who's brewing<br>near you?</h1>
+  <p>Find your coffee match, discover events, and explore the community.</p>
 </div>
 
-<!-- CONTENT -->
-<div class="page-container container">
+<div class="explore-container">
 
-  <h2 class="mb-2">Explore Community ☕</h2>
-  <p class="subtitle">Discover coffee lovers and their favourite brews</p>
+  <!-- LEFT: MATCH -->
+  <div class="panel left fade-in">
+    <h2 class="panel-heading">☕ Find Your Match</h2>
+    <p class="panel-sub">Connect with coffee lovers like you</p>
 
-  <!-- SEARCH -->
-  <input type="text" id="searchUser" class="form-control search-bar" placeholder="Search community members...">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Match by</label>
+        <select id="matchType" onchange="updateMatchOptions()">
+          <option value="coffee">By Coffee</option>
+          <option value="cafe">By Café</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Select</label>
+        <select id="matchValue"></select>
+      </div>
+    </div>
 
-  <!-- MAP PLACEHOLDER -->
-  <div id="map" class="mb-4">☕ Map coming soon</div>
+    <button class="btn-primary full-width" onclick="findMatch()">Find Match</button>
 
-  <!-- USERS -->
-  <div class="row mt-4" id="userList"></div>
+    <div id="matchResult" class="match-result hidden">
+      <div class="match-card">
+        <div class="match-avatar" id="matchAvatar"></div>
+        <h4 id="matchName"></h4>
+        <p id="matchMsg"></p>
+        <button class="btn-ghost" onclick="closeMatch()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: COMMUNITY -->
+  <div class="panel center fade-in">
+    <h2 class="panel-heading">Community</h2>
+    <p class="panel-sub">See what everyone's brewing</p>
+
+    <div id="userList" class="user-grid"></div>
+
+    <div class="discount-section">
+      <button class="btn-secondary" onclick="toggleDiscounts(this)">🔥 View Discounts</button>
+      <div id="discountList" class="discount-list hidden">
+        <div class="discount-item">20% off at Telegram Coffee — show this screen</div>
+        <div class="discount-item">Free pastry with any order at La Veen</div>
+        <div class="discount-item">15% off cold brew at Bossman Coffee</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: EVENTS -->
+  <div class="panel right fade-in">
+    <h2 class="panel-heading">📅 Events</h2>
+    <p class="panel-sub">Perth coffee meetups</p>
+
+    <div id="eventList" class="event-feed"></div>
+
+    <div class="event-form">
+      <p class="form-label">Add an event</p>
+      <input id="eventName" placeholder="Event name">
+      <input id="eventVenue" placeholder="Venue">
+      <input type="date" id="eventDate">
+      <button class="btn-primary full-width" onclick="addEvent()">+ Create Event</button>
+    </div>
+  </div>
 
 </div>
 
-<script src="/static/js/explore.js"></script>
+<!-- MAP SECTION -->
+<div class="map-section fade-in">
+  <div class="map-section-header">
+    <h2 class="panel-heading">☕ Perth CBD Coffee Spots</h2>
+    <p class="panel-sub">8 specialty cafes near you</p>
+  </div>
+  <div class="map-layout">
+    <div id="leaflet-map"></div>
+    <div class="cafe-sidebar">
+      <h3>Top Picks</h3>
+      <div id="cafeListItems"></div>
+    </div>
+  </div>
+</div>
 
-</body>
-</html>
+<!-- TOAST -->
+<div id="toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/explore.js') }}"></script>
+{% endblock %}
