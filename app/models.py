@@ -17,7 +17,7 @@ class CoffeeLog(db.Model):
     photo_path = db.Column(db.String(200), nullable=True)
     notes = db.Column(db.Text, nullable=True)
     date_logged = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_coffee_log_user'), nullable=True)
 
     def __repr__(self):
         return f'<CoffeeLog {self.id} - {self.cafe_name} - {self.coffee_type}>'
