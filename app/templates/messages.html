@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="chat-container">
+
+  <!-- LEFT: USERS -->
+  <div class="chat-sidebar">
+    <h2>Chats ☕</h2>
+    <div class="user-list">
+      <div class="user active" onclick="openChat('Dhruv')">Dhruv</div>
+      <div class="user" onclick="openChat('Winston')">Winston</div>
+      <div class="user" onclick="openChat('Hadia')">Hadia</div>
+      <div class="user" onclick="openChat('Aarav')">Aarav</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CHAT -->
+  <div class="chat-main">
+
+    <div class="chat-header">
+      <span id="chatName">Dhruv</span>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- messages will appear here -->
+    </div>
+
+    <div class="chat-input">
+      <input id="messageInput" placeholder="Type a message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+{% endblock %}

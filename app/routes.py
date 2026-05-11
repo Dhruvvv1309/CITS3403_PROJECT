@@ -110,3 +110,7 @@ def explore():
 @app.route('/user/<int:id>')
 def user(id):
     return render_template('user.html')
+
+@app.route('/messages')
+def messages():
+    return render_template('messages.html')
