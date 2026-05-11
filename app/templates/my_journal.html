@@ -18,7 +18,7 @@
       <div class="hero-name">Winston C.</div>
       <div class="hero-sub">Espresso lover · Perth</div>
       <div>
-        <span class="badge-pill">42 coffees</span>
+        <span class="badge-pill" id="journalCount">{{ entry_count }} coffees</span>
         <span class="badge-pill gold">Flat white regular</span>
         <span class="badge-pill">Explorer</span>
       </div>
@@ -46,16 +46,26 @@
 
   {% if entries %}
     {% for entry in entries %}
-      <div class="entry-card">
+      <div class="entry-card" data-entry-id="{{ entry.id }}">
         <div class="entry-summary">
           <div class="entry-main">
-            <div class="entry-name">{{ entry.title }}</div>
-            <div class="entry-meta">{{ entry.coffee_type }} · {{ entry.cafe_name }} · {{ entry.date_display }}</div>
-            <div class="entry-stars">{{ entry.stars }}</div>
-            <p class="entry-note">{{ entry.notes }}</p>
-            <button class="details-toggle" type="button" aria-expanded="false" aria-controls="entry-details-{{ loop.index }}">
-              View details
-            </button>
+            <div class="entry-name" data-entry-field="title">{{ entry.title }}</div>
+            <div class="entry-meta">
+              <span data-entry-field="coffee_type">{{ entry.coffee_type }}</span> ·
+              <span data-entry-field="cafe_name">{{ entry.cafe_name }}</span> ·
+              <span data-entry-field="date_display">{{ entry.date_display }}</span>
+            </div>
+            <div class="entry-stars" data-entry-field="stars">{{ entry.stars }}</div>
+            <p class="entry-note" data-entry-field="notes">{{ entry.notes }}</p>
+            <div class="entry-actions">
+              <button class="details-toggle" type="button" aria-expanded="false" aria-controls="entry-details-{{ loop.index }}">
+                View details
+              </button>
+              {% if not using_fallback %}
+                <button class="entry-action edit-entry" type="button">Edit</button>
+                <button class="entry-action delete-entry" type="button">Delete</button>
+              {% endif %}
+            </div>
           </div>
           {% if entry.photo_path %}
             <img class="entry-photo entry-photo-img" src="{{ url_for('static', filename=entry.photo_path) }}" alt="{{ entry.title }} photo"/>
@@ -67,27 +77,64 @@
           <div class="detail-grid">
             <div>
               <span class="detail-label">Cafe</span>
-              <span class="detail-value">{{ entry.cafe_name }}</span>
+              <span class="detail-value" data-entry-field="detail_cafe_name">{{ entry.cafe_name }}</span>
             </div>
             <div>
               <span class="detail-label">Coffee</span>
-              <span class="detail-value">{{ entry.coffee_type }}</span>
+              <span class="detail-value" data-entry-field="detail_coffee_type">{{ entry.coffee_type }}</span>
             </div>
             <div>
               <span class="detail-label">Rating</span>
-              <span class="detail-value">{{ entry.rating }}/5</span>
+              <span class="detail-value"><span data-entry-field="rating">{{ entry.rating }}</span>/5</span>
             </div>
             <div>
               <span class="detail-label">Date</span>
-              <span class="detail-value">{{ entry.date_display }}</span>
+              <span class="detail-value" data-entry-field="detail_date_display">{{ entry.date_display }}</span>
             </div>
           </div>
-          <p class="detail-note">{{ entry.notes }}</p>
+          <p class="detail-note" data-entry-field="detail_notes">{{ entry.notes }}</p>
         </div>
+        {% if not using_fallback %}
+          <form class="entry-edit-form" hidden>
+            <div class="edit-grid">
+              <div>
+                <label for="cafe-name-{{ entry.id }}">Cafe name</label>
+                <input id="cafe-name-{{ entry.id }}" name="cafe_name" type="text" value="{{ entry.cafe_name }}" required>
+              </div>
+              <div>
+                <label for="coffee-type-{{ entry.id }}">Coffee type</label>
+                <select id="coffee-type-{{ entry.id }}" name="coffee_type" required>
+                  <option value="cappuccino" {{ 'selected' if entry.coffee_type_value == 'cappuccino' else '' }}>Cappuccino</option>
+                  <option value="flat_white" {{ 'selected' if entry.coffee_type_value == 'flat_white' else '' }}>Flat White</option>
+                  <option value="latte" {{ 'selected' if entry.coffee_type_value == 'latte' else '' }}>Latte</option>
+                  <option value="long_black" {{ 'selected' if entry.coffee_type_value == 'long_black' else '' }}>Long Black</option>
+                  <option value="espresso" {{ 'selected' if entry.coffee_type_value == 'espresso' else '' }}>Espresso</option>
+                  <option value="iced_latte" {{ 'selected' if entry.coffee_type_value == 'iced_latte' else '' }}>Iced Latte</option>
+                  <option value="cold_brew" {{ 'selected' if entry.coffee_type_value == 'cold_brew' else '' }}>Cold Brew</option>
+                  <option value="cortado" {{ 'selected' if entry.coffee_type_value == 'cortado' else '' }}>Cortado</option>
+                  <option value="piccolo" {{ 'selected' if entry.coffee_type_value == 'piccolo' else '' }}>Piccolo</option>
+                  <option value="mocha" {{ 'selected' if entry.coffee_type_value == 'mocha' else '' }}>Mocha</option>
+                  <option value="pour_over" {{ 'selected' if entry.coffee_type_value == 'pour_over' else '' }}>Pour Over</option>
+                </select>
+              </div>
+              <div>
+                <label for="rating-{{ entry.id }}">Rating</label>
+                <input id="rating-{{ entry.id }}" name="rating" type="number" min="1" max="5" value="{{ entry.rating }}" required>
+              </div>
+            </div>
+            <label for="notes-{{ entry.id }}">Notes</label>
+            <textarea id="notes-{{ entry.id }}" name="notes" rows="3">{{ entry.notes }}</textarea>
+            <div class="edit-actions">
+              <button class="save-entry" type="submit">Save</button>
+              <button class="cancel-edit" type="button">Cancel</button>
+            </div>
+            <p class="entry-error" hidden></p>
+          </form>
+        {% endif %}
       </div>
     {% endfor %}
   {% else %}
-    <div class="empty-journal">No coffee logs yet.</div>
+    <div class="empty-journal" id="emptyJournal">No coffee logs yet.</div>
   {% endif %}
 
 </section>
