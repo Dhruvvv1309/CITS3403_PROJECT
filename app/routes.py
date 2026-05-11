@@ -140,7 +140,8 @@ def log_coffee():
             coffee_type=form.coffee_type.data,
             rating=form.rating.data,
             photo_path=photo_path,
-            notes=form.notes.data)
+            notes=form.notes.data,
+            user_id=current_user.id)
         db.session.add(entry)
         db.session.commit()
         flash('Coffee logged successfully!')
