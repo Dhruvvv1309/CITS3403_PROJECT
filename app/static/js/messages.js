@@ -1,49 +1,61 @@
-let currentUser = "Dhruv";
+let currentUserId = window.currentUserId;
+let loggedInUserId = window.loggedInUserId;
 
-const chats = {
-    "Dhruv": [],
-    "Winston": [],
-    "Hadia": [],
-    "Aarav": []
-};
-
-function openChat(name) {
-    currentUser = name;
+/* ---------- SWITCH CHAT ---------- */
+function openChat(id, name) {
+    currentUserId = id;
     document.getElementById("chatName").innerText = name;
-    renderMessages();
+    loadMessages();
 }
 
+/* ---------- LOAD MESSAGES ---------- */
+function loadMessages() {
+    fetch(`/get_messages/${currentUserId}`)
+    .then(res => res.json())
+    .then(data => {
+        const box = document.getElementById("chatMessages");
+        box.innerHTML = "";
+
+        data.forEach(m => {
+            const div = document.createElement("div");
+
+            // ✅ FIXED LOGIC
+            if (m.sender === loggedInUserId) {
+                div.className = "message sent";
+            } else {
+                div.className = "message received";
+            }
+
+            div.innerText = m.content;
+            box.appendChild(div);
+        });
+
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+/* ---------- SEND MESSAGE ---------- */
 function sendMessage() {
     const input = document.getElementById("messageInput");
     const text = input.value.trim();
 
     if (!text) return;
 
-    chats[currentUser].push({ text, type: "sent" });
-
-    // fake reply (for demo)
-    setTimeout(() => {
-        chats[currentUser].push({
-            text: "Nice coffee choice ☕",
-            type: "received"
-        });
-        renderMessages();
-    }, 800);
-
-    input.value = "";
-    renderMessages();
-}
-
-function renderMessages() {
-    const container = document.getElementById("chatMessages");
-    container.innerHTML = "";
-
-    chats[currentUser].forEach(msg => {
-        const div = document.createElement("div");
-        div.className = "message " + msg.type;
-        div.innerText = msg.text;
-        container.appendChild(div);
+    fetch('/send_message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `receiver_id=${currentUserId}&content=${encodeURIComponent(text)}`
+    })
+    .then(() => {
+        input.value = "";
+        loadMessages();
     });
-
-    container.scrollTop = container.scrollHeight;
 }
+
+/* ---------- AUTO REFRESH ---------- */
+setInterval(loadMessages, 2000);
+
+/* ---------- INIT ---------- */
+loadMessages();
