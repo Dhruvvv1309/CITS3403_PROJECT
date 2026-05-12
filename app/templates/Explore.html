@@ -51,11 +51,25 @@
     <h2 class="panel-heading">Community</h2>
     <p class="panel-sub">See what everyone's brewing</p>
 
-    <div id="userList" class="user-grid"></div>
+    <div class="user-grid">
+      {% for user in users %}
+        {% if user.id != current_user.id %}
+          <div class="user-card" style="animation: fadeUp 0.4s ease {{ loop.index0 * 0.07 }}s both;">
+            <div class="user-initial">{{ user.username[0] | upper }}</div>
+            <div class="user-name">{{ user.username }}</div>
+            <div class="user-coffee">{{ user.favourite_coffee or "Coffee Lover" }}</div>
+            <span class="user-tag">{{ user.favourite_coffee or "Community" }}</span><br>
+            <a href="{{ url_for('chat', user_id=user.id) }}">
+              <button class="view-btn">Message</button>
+            </a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
 
     <div class="discount-section">
       <button class="btn-secondary" onclick="toggleDiscounts(this)">🔥 View Discounts</button>
-      <div id="discountList" class="discount-list hidden">
+      <div id="discountList" class="discount-list">
         <div class="discount-item">20% off at Telegram Coffee — show this screen</div>
         <div class="discount-item">Free pastry with any order at La Veen</div>
         <div class="discount-item">15% off cold brew at Bossman Coffee</div>
@@ -72,8 +86,8 @@
 
     <div class="event-form">
       <p class="form-label">Add an event</p>
-      <input id="eventName" placeholder="Event name">
-      <input id="eventVenue" placeholder="Venue">
+      <input type="text" id="eventName" placeholder="Event name">
+      <input type="text" id="eventVenue" placeholder="Venue">
       <input type="date" id="eventDate">
       <button class="btn-primary full-width" onclick="addEvent()">+ Create Event</button>
     </div>
@@ -85,7 +99,7 @@
 <div class="map-section fade-in">
   <div class="map-section-header">
     <h2 class="panel-heading">☕ Perth CBD Coffee Spots</h2>
-    <p class="panel-sub">8 specialty cafes near you</p>
+    <p class="panel-sub">8 specialty cafes near you — click any pin or card</p>
   </div>
   <div class="map-layout">
     <div id="leaflet-map"></div>
@@ -96,7 +110,6 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 {% endblock %}
