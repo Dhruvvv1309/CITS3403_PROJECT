@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-from flask import flash, redirect, render_template, url_for, request
-=======
 from flask import flash, jsonify, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user, login_required, current_user
->>>>>>> origin/main
 from app import app, db
-from app.forms import CoffeeLogForm
+from app.forms import CoffeeLogForm, LoginForm, SignupForm
 import os
-from app.models import CoffeeLog, Message, User
-from flask_login import current_user, login_required
-
-
-# ---------------- HELPER FUNCTIONS ---------------- #
+from app.models import CoffeeLog, User
 
 def _rating_stars(rating):
     rating = int(rating or 0)
@@ -32,11 +24,8 @@ def _fallback_journal_entries():
             'rating': 5,
             'stars': '★★★★★',
             'photo_path': None,
-            'notes': 'Sample entry',
+            'notes': 'Incredibly silky texture with a sweet almond finish. Almost too pretty to drink.',
             'date_display': 'yesterday',
-<<<<<<< HEAD
-        }
-=======
         },
         {
             'id': 2,
@@ -74,7 +63,6 @@ def _fallback_journal_entries():
             'notes': 'Beautifully balanced. Floral jasmine notes with a honey sweetness.',
             'date_display': '1 week ago',
         },
->>>>>>> origin/main
     ]
 
 def _journal_entry_from_log(log):
@@ -92,27 +80,49 @@ def _journal_entry_from_log(log):
         'date_display': log.date_logged.strftime('%d %b %Y') if log.date_logged else 'No date',
     }
 
-<<<<<<< HEAD
-
-# ---------------- ROUTES ---------------- #
-
-@app.route('/')
-=======
 def _entry_count():
     return CoffeeLog.query.filter_by(user_id=current_user.id).count()
 
 @app.route('/', methods=['GET', 'POST'])
->>>>>>> origin/main
 def home():
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('my_journal'))
+        flash('Invalid email or password')
+    return render_template('login.html', form=form)
 
-
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    return render_template('signup.html')
+    form = SignupForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('Email already registered. Please log in.')
+            return redirect(url_for('home'))
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        return redirect(url_for('my_journal'))
+    return render_template('signup.html', form=form)
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@app.route('/explore')
+@login_required
+def explore():
+    return render_template('Explore.html')
 
 @app.route('/my_journal')
+@login_required
 def my_journal():
     using_fallback = False
     try:
@@ -125,9 +135,6 @@ def my_journal():
         entry_count = len(entries)
         using_fallback = True
 
-<<<<<<< HEAD
-    return render_template('my_journal.html', entries=entries, using_fallback=using_fallback)
-=======
     return render_template('my_journal.html', entries=entries, entry_count=entry_count, using_fallback=using_fallback)
 
 @app.route('/my_journal/<int:entry_id>/edit', methods=['POST'])
@@ -168,116 +175,29 @@ def delete_journal_entry(entry_id):
     db.session.commit()
 
     return jsonify({'success': True, 'entry_count': _entry_count()})
->>>>>>> origin/main
-
 
 @app.route('/log-coffee', methods=['GET', 'POST'])
+@login_required
 def log_coffee():
     form = CoffeeLogForm()
-
     if form.validate_on_submit():
         photo = form.photo.data
-        filename = photo.filename
-
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
+        photo_filename = photo.filename
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
+        photo_path = f'uploads/{photo_filename}'
         entry = CoffeeLog(
             cafe_name=form.cafe_name.data,
             coffee_type=form.coffee_type.data,
             rating=form.rating.data,
-            photo_path=f'uploads/{filename}',
-            notes=form.notes.data
-        )
-
+            photo_path=photo_path,
+            notes=form.notes.data,
+            user_id=current_user.id)
         db.session.add(entry)
         db.session.commit()
-
         flash('Coffee logged successfully!')
         return redirect(url_for('my_journal'))
-
-    return render_template('log-coffee.html', form=form)
-
+    return render_template('log-coffee.html', title='Log a Coffee', form=form)
 
 @app.route('/game')
 def game():
     return render_template('game.html')
-<<<<<<< HEAD
-
-
-# 🔥 UPDATED EXPLORE (DATABASE USERS)
-@app.route('/explore')
-def explore():
-    users = User.query.all()
-    return render_template('Explore.html', users=users)
-
-
-@app.route('/user/<int:id>')
-def user(id):
-    return render_template('user.html')
-
-
-# ---------------- MESSAGING ---------------- #
-
-# 🔥 Redirect /messages → first available chat
-@app.route('/messages')
-@login_required
-def messages_redirect():
-    first_user = User.query.filter(User.id != current_user.id).first()
-
-    if not first_user:
-        return "No users available to chat"
-
-    return redirect(url_for('chat', user_id=first_user.id))
-
-
-# 🔥 Open chat with specific user
-@app.route('/messages/<int:user_id>')
-@login_required
-def chat(user_id):
-    other_user = User.query.get(user_id)
-    users = User.query.filter(User.id != current_user.id).all()
-
-    return render_template(
-        'messages.html',
-        user=other_user,
-        users=users
-    )
-
-
-# 🔥 Send message
-@app.route('/send_message', methods=['POST'])
-@login_required
-def send_message():
-    receiver_id = request.form.get('receiver_id')
-    content = request.form.get('content')
-
-    if not content:
-        return {'status': 'error'}
-
-    msg = Message(
-        sender_id=current_user.id,
-        receiver_id=receiver_id,
-        content=content
-    )
-
-    db.session.add(msg)
-    db.session.commit()
-
-    return {'status': 'ok'}
-
-
-# 🔥 Get messages between users
-@app.route('/get_messages/<int:user_id>')
-@login_required
-def get_messages(user_id):
-    messages = Message.query.filter(
-        ((Message.sender_id == current_user.id) & (Message.receiver_id == user_id)) |
-        ((Message.sender_id == user_id) & (Message.receiver_id == current_user.id))
-    ).order_by(Message.timestamp).all()
-
-    return [{
-        'sender': m.sender_id,
-        'content': m.content
-    } for m in messages]
-=======
->>>>>>> origin/main
