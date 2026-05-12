@@ -41,3 +41,32 @@ class User(db.Model, UserMixin):
     
     def __repr__(self):
         return f'<User {self.username}>' 
+
+
+
+class Message(db.Model):
+    __tablename__ = 'message'
+ 
+    id          = db.Column(db.Integer, primary_key=True)
+    sender_id   = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_msg_sender'),   nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_msg_receiver'), nullable=False)
+    body        = db.Column(db.Text, nullable=False)
+    timestamp   = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    read        = db.Column(db.Boolean, default=False)
+ 
+    sender   = db.relationship('User', foreign_keys=[sender_id],   backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+ 
+    def to_dict(self):
+        return {
+            'id':          self.id,
+            'sender_id':   self.sender_id,
+            'receiver_id': self.receiver_id,
+            'body':        self.body,
+            'timestamp':   self.timestamp.strftime('%H:%M'),
+            'date':        self.timestamp.strftime('%d %b %Y'),
+            'read':        self.read,
+        }
+ 
+    def __repr__(self):
+        return f'<Message {self.id}: {self.sender_id} → {self.receiver_id}>'
