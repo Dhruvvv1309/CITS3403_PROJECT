@@ -1,9 +1,12 @@
 from flask import flash, jsonify, redirect, render_template, request, url_for
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import current_user, login_required, login_user, logout_user
 from app import app, db
 from app.forms import CoffeeLogForm, LoginForm, SignupForm
+from app.models import CoffeeLog, Message, User
 import os
-from app.models import CoffeeLog, User
+
+
+# ---------------- HELPER FUNCTIONS ---------------- #
 
 def _user_initials(username):
     parts = (username or 'User').split()
@@ -11,13 +14,16 @@ def _user_initials(username):
         return ''.join(part[0] for part in parts[:2]).upper()
     return parts[0][:2].upper()
 
+
 def _rating_stars(rating):
     rating = int(rating or 0)
     rating = max(0, min(rating, 5))
     return '★' * rating + '☆' * (5 - rating)
 
+
 def _coffee_type_label(coffee_type):
     return (coffee_type or 'Coffee').replace('_', ' ').title()
+
 
 def _favorite_coffee_badge(logs):
     if not logs:
@@ -30,6 +36,7 @@ def _favorite_coffee_badge(logs):
     favorite = max(counts, key=counts.get)
     return f'{_coffee_type_label(favorite)} regular'
 
+
 def _activity_badge(entry_count):
     if entry_count == 0:
         return 'New Sipper'
@@ -38,6 +45,7 @@ def _activity_badge(entry_count):
     if entry_count < 20:
         return 'Explorer'
     return 'Coffee Pro'
+
 
 def _fallback_journal_entries():
     return [
@@ -91,6 +99,7 @@ def _fallback_journal_entries():
         },
     ]
 
+
 def _journal_entry_from_log(log):
     coffee_type = _coffee_type_label(log.coffee_type)
     return {
@@ -106,11 +115,16 @@ def _journal_entry_from_log(log):
         'date_display': log.date_logged.strftime('%d %b %Y') if log.date_logged else 'No date',
     }
 
+
 def _entry_count():
     return CoffeeLog.query.filter_by(user_id=current_user.id).count()
 
+
 def _current_user_logs():
     return CoffeeLog.query.filter_by(user_id=current_user.id).order_by(CoffeeLog.date_logged.desc()).all()
+
+
+# ---------------- ROUTES ---------------- #
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -122,6 +136,7 @@ def home():
             return redirect(url_for('my_journal'))
         flash('Invalid email or password')
     return render_template('login.html', form=form)
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -139,16 +154,13 @@ def signup():
         return redirect(url_for('my_journal'))
     return render_template('signup.html', form=form)
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route('/explore')
-@login_required
-def explore():
-    return render_template('Explore.html')
 
 @app.route('/my_journal')
 @login_required
@@ -175,6 +187,7 @@ def my_journal():
         user_initials=_user_initials(current_user.username),
         using_fallback=using_fallback,
     )
+
 
 @app.route('/my_journal/<int:entry_id>/edit', methods=['POST'])
 @login_required
@@ -203,6 +216,7 @@ def edit_journal_entry(entry_id):
 
     return jsonify({'success': True, 'entry': _journal_entry_from_log(entry)})
 
+
 @app.route('/my_journal/<int:entry_id>/delete', methods=['POST'])
 @login_required
 def delete_journal_entry(entry_id):
@@ -216,28 +230,110 @@ def delete_journal_entry(entry_id):
 
     return jsonify({'success': True, 'activity_badge': _activity_badge(entry_count), 'entry_count': entry_count})
 
+
 @app.route('/log-coffee', methods=['GET', 'POST'])
 @login_required
 def log_coffee():
     form = CoffeeLogForm()
+
     if form.validate_on_submit():
         photo = form.photo.data
-        photo_filename = photo.filename
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
-        photo_path = f'uploads/{photo_filename}'
+        filename = photo.filename
+
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
         entry = CoffeeLog(
             cafe_name=form.cafe_name.data,
             coffee_type=form.coffee_type.data,
             rating=form.rating.data,
-            photo_path=photo_path,
+            photo_path=f'uploads/{filename}',
             notes=form.notes.data,
-            user_id=current_user.id)
+            user_id=current_user.id,
+        )
+
         db.session.add(entry)
         db.session.commit()
+
         flash('Coffee logged successfully!')
         return redirect(url_for('my_journal'))
-    return render_template('log-coffee.html', title='Log a Coffee', form=form)
+
+    return render_template('log-coffee.html', form=form)
+
 
 @app.route('/game')
 def game():
     return render_template('game.html')
+
+
+@app.route('/explore')
+@login_required
+def explore():
+    users = User.query.all()
+    return render_template('Explore.html', users=users)
+
+
+@app.route('/user/<int:id>')
+@login_required
+def user(id):
+    return render_template('user.html')
+
+
+# ---------------- MESSAGING ---------------- #
+
+@app.route('/messages')
+@login_required
+def messages_redirect():
+    first_user = User.query.filter(User.id != current_user.id).first()
+
+    if not first_user:
+        return 'No users available to chat'
+
+    return redirect(url_for('chat', user_id=first_user.id))
+
+
+@app.route('/messages/<int:user_id>')
+@login_required
+def chat(user_id):
+    other_user = User.query.get(user_id)
+    users = User.query.filter(User.id != current_user.id).all()
+
+    return render_template(
+        'messages.html',
+        user=other_user,
+        users=users,
+    )
+
+
+@app.route('/send_message', methods=['POST'])
+@login_required
+def send_message():
+    receiver_id = request.form.get('receiver_id')
+    content = request.form.get('content')
+
+    if not content:
+        return {'status': 'error'}
+
+    msg = Message(
+        sender_id=current_user.id,
+        receiver_id=receiver_id,
+        content=content,
+    )
+
+    db.session.add(msg)
+    db.session.commit()
+
+    return {'status': 'ok'}
+
+
+@app.route('/get_messages/<int:user_id>')
+@login_required
+def get_messages(user_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.receiver_id == user_id)) |
+        ((Message.sender_id == user_id) & (Message.receiver_id == current_user.id))
+    ).order_by(Message.timestamp).all()
+
+    return [{
+        'sender': m.sender_id,
+        'content': m.content,
+    } for m in messages]
