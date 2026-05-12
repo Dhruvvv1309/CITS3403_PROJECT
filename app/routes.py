@@ -4,6 +4,8 @@ from app import app, db
 from app.forms import CoffeeLogForm, LoginForm, SignupForm
 import os
 from app.models import CoffeeLog, User
+from app.models import Message
+from sqlalchemy import or_, and_
 
 def _rating_stars(rating):
     rating = int(rating or 0)
@@ -116,10 +118,7 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route('/explore')
-@login_required
-def explore():
-    return render_template('Explore.html')
+# /explore is defined below with real user data
 
 @app.route('/my_journal')
 @login_required
@@ -201,3 +200,225 @@ def log_coffee():
 @app.route('/game')
 def game():
     return render_template('game.html')
+
+
+
+# ── Explore (now passes real DB users) ──────────────────────
+
+@app.route('/explore')
+@login_required
+def explore():                          # replaces the stub above
+    users = User.query.all()
+    return render_template('Explore.html', users=users)
+
+
+# ── Messages page ────────────────────────────────────────────
+
+@app.route('/messages')
+@app.route('/messages/<int:other_id>')
+@login_required
+def messages(other_id=None):
+    """
+    Render the messages page.
+    If other_id is given, that conversation is pre-selected via JS.
+    Pass all other users so the sidebar can be populated.
+    """
+    users = User.query.filter(User.id != current_user.id).all()
+
+    # Build conversation list: for each user this person has chatted with,
+    # grab the latest message and unread count.
+    conversations = []
+    for u in users:
+        latest = (
+            Message.query
+            .filter(
+                or_(
+                    and_(Message.sender_id == current_user.id, Message.receiver_id == u.id),
+                    and_(Message.sender_id == u.id,            Message.receiver_id == current_user.id),
+                )
+            )
+            .order_by(Message.timestamp.desc())
+            .first()
+        )
+        unread = (
+            Message.query
+            .filter_by(sender_id=u.id, receiver_id=current_user.id, read=False)
+            .count()
+        )
+        if latest:
+            conversations.append({
+                'user':    u,
+                'preview': latest.body[:60],
+                'time':    latest.timestamp.strftime('%H:%M'),
+                'unread':  unread,
+            })
+
+    # Sort by most recent first; users with no messages go to the bottom
+    conversations.sort(key=lambda c: c['time'], reverse=True)
+
+    # Users with no messages yet (so they still show up in New Message modal)
+    talked_ids = {c['user'].id for c in conversations}
+    fresh_users = [u for u in users if u.id not in talked_ids]
+
+    return render_template(
+        'messages.html',
+        conversations=conversations,
+        fresh_users=fresh_users,
+        open_user_id=other_id,
+    )
+
+
+# ── API: fetch messages between current user and another ─────
+
+@app.route('/api/messages/<int:other_id>')
+@login_required
+def api_get_messages(other_id):
+    other = User.query.get_or_404(other_id)
+
+    # Mark messages from the other person as read
+    Message.query.filter_by(
+        sender_id=other_id,
+        receiver_id=current_user.id,
+        read=False
+    ).update({'read': True})
+    db.session.commit()
+
+    msgs = (
+        Message.query
+        .filter(
+            or_(
+                and_(Message.sender_id == current_user.id, Message.receiver_id == other_id),
+                and_(Message.sender_id == other_id,        Message.receiver_id == current_user.id),
+            )
+        )
+        .order_by(Message.timestamp.asc())
+        .all()
+    )
+
+    return jsonify({
+        'other': {'id': other.id, 'username': other.username},
+        'messages': [m.to_dict() for m in msgs],
+    })
+
+
+# ── API: send a message ───────────────────────────────────────
+
+@app.route('/api/messages/<int:other_id>/send', methods=['POST'])
+@login_required
+def api_send_message(other_id):
+    other = User.query.get_or_404(other_id)
+    data  = request.get_json() or {}
+    body  = (data.get('body') or '').strip()
+
+    if not body:
+        return jsonify({'success': False, 'error': 'Message cannot be empty.'}), 400
+
+    msg = Message(sender_id=current_user.id, receiver_id=other_id, body=body)
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': msg.to_dict()})
+
+
+# ── API: unread count (for nav badge) ────────────────────────
+
+@app.route('/api/messages/unread')
+@login_required
+def api_unread_count():
+    count = Message.query.filter_by(receiver_id=current_user.id, read=False).count()
+    return jsonify({'unread': count})
+
+# ── API: Find a match based on shared coffee logs ────────────
+# Append this to the bottom of your existing routes.py
+
+# ── REPLACE the existing /api/match route in routes.py with this ──────────
+
+@app.route('/api/match')
+@login_required
+def api_match():
+    """
+    Match users by:
+      - coffee_type (from dropdown, optional)
+      - cafe_name   (free text, optional, partial match)
+    At least one must be provided OR we fall back to scanning all logs.
+    """
+    coffee_filter = (request.args.get('coffee_type') or '').strip().lower()
+    cafe_filter   = (request.args.get('cafe_name')   or '').strip().lower()
+
+    # If nothing provided, use the current user's own logs to find matches
+    use_user_logs = not coffee_filter and not cafe_filter
+
+    if use_user_logs:
+        my_logs = CoffeeLog.query.filter_by(user_id=current_user.id).all()
+        if not my_logs:
+            return jsonify({
+                'success': False,
+                'message': "Log some coffees first and we'll find your matches! ☕"
+            })
+        my_coffees = {log.coffee_type.lower().strip() for log in my_logs if log.coffee_type}
+        my_cafes   = {log.cafe_name.lower().strip()   for log in my_logs if log.cafe_name}
+    else:
+        my_coffees = {coffee_filter} if coffee_filter else set()
+        my_cafes   = {cafe_filter}   if cafe_filter   else set()
+
+    other_users = User.query.filter(User.id != current_user.id).all()
+
+    scored = []
+    for user in other_users:
+        their_logs = CoffeeLog.query.filter_by(user_id=user.id).all()
+        if not their_logs:
+            continue
+
+        their_coffees = {log.coffee_type.lower().strip() for log in their_logs if log.coffee_type}
+        their_cafes   = {log.cafe_name.lower().strip()   for log in their_logs if log.cafe_name}
+
+        # Coffee: exact match
+        shared_coffees = my_coffees & their_coffees
+
+        # Cafe: partial match (user typed "telegram" matches "Telegram Coffee")
+        shared_cafes = set()
+        for my_cafe in my_cafes:
+            for their_cafe in their_cafes:
+                if my_cafe in their_cafe or their_cafe in my_cafe:
+                    shared_cafes.add(their_cafe)
+
+        # Must match at least one of the filters if filters were provided
+        if not use_user_logs:
+            coffee_ok = (not coffee_filter) or bool(shared_coffees)
+            cafe_ok   = (not cafe_filter)   or bool(shared_cafes)
+            if not (coffee_ok and cafe_ok):
+                continue
+
+        score = len(shared_coffees) * 2 + len(shared_cafes)
+        if score == 0:
+            continue
+
+        reasons = []
+        if shared_coffees:
+            reasons.append(f"both love {', '.join(c.title() for c in shared_coffees)}")
+        if shared_cafes:
+            reasons.append(f"both visit {', '.join(c.title() for c in shared_cafes)}")
+
+        scored.append({
+            'id':             user.id,
+            'username':       user.username,
+            'score':          score,
+            'reason':         " and ".join(reasons),
+            'shared_coffees': list(shared_coffees),
+            'shared_cafes':   list(shared_cafes),
+        })
+
+    if not scored:
+        msg = "No matches found"
+        if coffee_filter and cafe_filter:
+            msg = f"No one shares {coffee_filter.title()} at {cafe_filter.title()} yet!"
+        elif coffee_filter:
+            msg = f"No one else has logged {coffee_filter.title()} yet!"
+        elif cafe_filter:
+            msg = f"No one else has visited '{cafe_filter.title()}' yet!"
+        else:
+            msg = "No matches yet — invite friends to join cuplog! ☕"
+        return jsonify({'success': False, 'message': msg})
+
+    scored.sort(key=lambda x: x['score'], reverse=True)
+    return jsonify({'success': True, 'matches': scored[:3]})
