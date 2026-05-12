@@ -1,8 +1,9 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for, request
 from app import app, db
 from app.forms import CoffeeLogForm
 import os
-from app.models import CoffeeLog
+from app.models import CoffeeLog, Message, User
+from flask_login import current_user, login_required
 
 
 # ---------------- HELPER FUNCTIONS ---------------- #
@@ -25,7 +26,7 @@ def _fallback_journal_entries():
             'rating': 5,
             'stars': '★★★★★',
             'photo_path': None,
-            'notes': 'Incredibly silky texture with a sweet almond finish.',
+            'notes': 'Sample entry',
             'date_display': 'yesterday',
         }
     ]
@@ -74,18 +75,18 @@ def my_journal():
 @app.route('/log-coffee', methods=['GET', 'POST'])
 def log_coffee():
     form = CoffeeLogForm()
+
     if form.validate_on_submit():
         photo = form.photo.data
-        photo_filename = photo.filename
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
+        filename = photo.filename
 
-        photo_path = f'uploads/{photo_filename}'
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         entry = CoffeeLog(
             cafe_name=form.cafe_name.data,
             coffee_type=form.coffee_type.data,
             rating=form.rating.data,
-            photo_path=photo_path,
+            photo_path=f'uploads/{filename}',
             notes=form.notes.data
         )
 
@@ -103,14 +104,78 @@ def game():
     return render_template('game.html')
 
 
+# 🔥 UPDATED EXPLORE (DATABASE USERS)
 @app.route('/explore')
 def explore():
-    return render_template('explore.html')
+    users = User.query.all()
+    return render_template('Explore.html', users=users)
+
 
 @app.route('/user/<int:id>')
 def user(id):
     return render_template('user.html')
 
+
+# ---------------- MESSAGING ---------------- #
+
+# 🔥 Redirect /messages → first available chat
 @app.route('/messages')
-def messages():
-    return render_template('messages.html')
+@login_required
+def messages_redirect():
+    first_user = User.query.filter(User.id != current_user.id).first()
+
+    if not first_user:
+        return "No users available to chat"
+
+    return redirect(url_for('chat', user_id=first_user.id))
+
+
+# 🔥 Open chat with specific user
+@app.route('/messages/<int:user_id>')
+@login_required
+def chat(user_id):
+    other_user = User.query.get(user_id)
+    users = User.query.filter(User.id != current_user.id).all()
+
+    return render_template(
+        'messages.html',
+        user=other_user,
+        users=users
+    )
+
+
+# 🔥 Send message
+@app.route('/send_message', methods=['POST'])
+@login_required
+def send_message():
+    receiver_id = request.form.get('receiver_id')
+    content = request.form.get('content')
+
+    if not content:
+        return {'status': 'error'}
+
+    msg = Message(
+        sender_id=current_user.id,
+        receiver_id=receiver_id,
+        content=content
+    )
+
+    db.session.add(msg)
+    db.session.commit()
+
+    return {'status': 'ok'}
+
+
+# 🔥 Get messages between users
+@app.route('/get_messages/<int:user_id>')
+@login_required
+def get_messages(user_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.receiver_id == user_id)) |
+        ((Message.sender_id == user_id) & (Message.receiver_id == current_user.id))
+    ).order_by(Message.timestamp).all()
+
+    return [{
+        'sender': m.sender_id,
+        'content': m.content
+    } for m in messages]

@@ -1,6 +1,11 @@
-from app import db
+from app import db, login_manager
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 class CoffeeLog(db.Model):
     __tablename__ = 'coffee_log'
@@ -12,12 +17,12 @@ class CoffeeLog(db.Model):
     photo_path = db.Column(db.String(200), nullable=True)
     notes = db.Column(db.Text, nullable=True)
     date_logged = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_coffee_log_user'), nullable=True)
 
     def __repr__(self):
         return f'<CoffeeLog {self.id} - {self.cafe_name} - {self.coffee_type}>'
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'user'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -35,4 +40,4 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.username}>' 
