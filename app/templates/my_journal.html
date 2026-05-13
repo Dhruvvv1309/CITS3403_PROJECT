@@ -12,15 +12,15 @@
 <!-- Hero section -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="avatar">WC</div>
+    <div class="avatar">{{ user_initials }}</div>
 
     <div class="hero-info">
-      <div class="hero-name">Winston C.</div>
-      <div class="hero-sub">Espresso lover · Perth</div>
+      <div class="hero-name">{{ current_user.username }}</div>
+      <div class="hero-sub">Coffee lover</div>
       <div>
         <span class="badge-pill" id="journalCount">{{ entry_count }} coffees</span>
-        <span class="badge-pill gold">Flat white regular</span>
-        <span class="badge-pill">Explorer</span>
+        <span class="badge-pill gold">{{ favorite_badge }}</span>
+        <span class="badge-pill" id="activityBadge">{{ activity_badge }}</span>
       </div>
     </div>
 
