@@ -14,7 +14,7 @@ body {
 /* NAVBAR */
 .top-nav {
   background: #352010;
-  padding: 0.9rem 2rem;
+  padding: 1.2rem 2rem 0.6rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -40,10 +40,16 @@ body {
 .nav-links a {
   color: #c8b99a;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
 }
 .nav-links a:hover {
   color: #F2EDE4;
+  background: rgba(196,127,60,0.15);
+  font-weight: 700;
 }
 .nav-links a.active {
   color: #C47F3C;
