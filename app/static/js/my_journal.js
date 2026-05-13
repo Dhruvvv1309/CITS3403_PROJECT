@@ -1,6 +1,7 @@
 const detailButtons = document.querySelectorAll('.details-toggle');
 const journalCount = document.getElementById('journalCount');
 const journalSection = document.querySelector('.journal-section');
+const activityBadge = document.getElementById('activityBadge');
 
 detailButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -20,6 +21,14 @@ function updateCoffeeCount(count) {
     }
 
     journalCount.textContent = `${count} ${count === 1 ? 'coffee' : 'coffees'}`;
+}
+
+function updateActivityBadge(label) {
+    if (!activityBadge || !label) {
+        return;
+    }
+
+    activityBadge.textContent = label;
 }
 
 function showEntryError(card, message) {
@@ -155,6 +164,7 @@ document.querySelectorAll('.delete-entry').forEach(button => {
 
             card.remove();
             updateCoffeeCount(data.entry_count);
+            updateActivityBadge(data.activity_badge);
 
             if (data.entry_count === 0) {
                 showEmptyJournal();
