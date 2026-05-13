@@ -29,8 +29,7 @@ def upgrade():
     sa.UniqueConstraint('username')
     )
     with op.batch_alter_table('coffee_log', schema=None) as batch_op:
-        batch_op.create_foreign_key(None, 'user', ['user_id'], ['id'])
-
+        batch_op.create_foreign_key('fk_coffee_log_user', 'user', ['user_id'], ['id'])
     # ### end Alembic commands ###
 
 
