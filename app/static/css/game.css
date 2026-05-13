@@ -1,9 +1,12 @@
 body {
-  background: #1a0f07;
+  background: #2C1A0E;
   font-family: 'DM Sans', sans-serif;
   color: #F2EDE4;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .game-wrapper {
   max-width: 1100px;
@@ -36,10 +39,10 @@ body {
 }
 
 .ingredients-panel, .mixing-panel, .result-panel {
-  background: #2C1A0E;
+  background: #F2EDE4;
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #4a2e1a;
+  border: 1px solid #d4b896;
 }
 
 .ingredients-panel h2, .mixing-panel h2, .result-panel h2 {
@@ -56,19 +59,19 @@ body {
 }
 
 .ingredient {
-  background: #3d2211;
-  border: 1px solid #5a3a20;
+  background: #FAF7F2;
+  border: 1px solid #d4b896;
   border-radius: 10px;
   padding: 0.6rem 1rem;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.95rem;
-  color: #c8b99a;
+  color: #C47F3C;
 }
 
 .ingredient:hover {
-  background: #4e2e18;
-  color: #F2EDE4;
+  background: #e8ddd0;
+  color: #2C1A0E;
 }
 
 .ingredient.selected {
@@ -80,7 +83,7 @@ body {
 
 .mix-zone {
   min-height: 120px;
-  background: #1a0f07;
+  background: #FAF7F2;
   border-radius: 10px;
   padding: 1rem;
   display: flex;
@@ -88,11 +91,11 @@ body {
   gap: 0.5rem;
   align-content: flex-start;
   margin-bottom: 1rem;
-  border: 1px dashed #4a2e1a;
+  border: 1px dashed #d4b896;
 }
 
 .mix-hint {
-  color: #5a3a20;
+  color: #a89880;
   font-size: 0.9rem;
   width: 100%;
   text-align: center;
@@ -100,8 +103,8 @@ body {
 }
 
 .mix-tag {
-  background: #4e2e18;
-  color: #F2EDE4;
+  background: #e8ddd0;
+  color: #2C1A0E;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -129,8 +132,8 @@ body {
 
 .btn-clear {
   background: transparent;
-  color: #c8b99a;
-  border: 1px solid #4a2e1a;
+  color: #7a6550;
+  border: 1px solid #d4b896;
   padding: 0.7rem 1rem;
   border-radius: 10px;
   cursor: pointer;
@@ -138,7 +141,7 @@ body {
   transition: all 0.2s;
 }
 
-.btn-clear:hover { background: #2C1A0E; color: #F2EDE4; }
+.btn-clear:hover { background: #e8ddd0; color: #2C1A0E; }
 
 .result-panel {
   display: flex;
@@ -166,7 +169,7 @@ body {
 .result-card.fail h2 { color: #8b4a4a; }
 
 #resultDesc {
-  color: #c8b99a;
+  color: #7a6550;
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 0.8rem;
@@ -174,7 +177,7 @@ body {
 
 #resultRecipe {
   font-size: 0.8rem;
-  color: #5a3a20;
+  color: #a89880;
   font-style: italic;
 }
 
@@ -196,8 +199,8 @@ body {
 }
 
 .collection-item {
-  background: #2C1A0E;
-  border: 1px solid #4a2e1a;
+  background: #F2EDE4;
+  border: 1px solid #d4b896;
   border-radius: 12px;
   padding: 1rem 0.5rem;
   text-align: center;
@@ -205,11 +208,93 @@ body {
 }
 
 .collection-item span { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
-.collection-item p { font-size: 0.8rem; color: #c8b99a; }
+.collection-item p { font-size: 0.8rem; color: #7a6550; }
 
 .collection-item.found {
   border-color: #C47F3C;
   background: #3d2211;
+  color: #F2EDE4;
 }
 
+.collection-item.found p { color: #c8b99a; }
+
 .collection-item.locked { opacity: 0.4; }
+
+.encyclopedia-area {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #4a2e1a;
+}
+
+.encyclopedia-area h2 {
+  font-family: 'Playfair Display', serif;
+  color: #C47F3C;
+  margin-bottom: 0.4rem;
+  font-size: 1.4rem;
+}
+
+.encyclopedia-sub {
+  color: #c8b99a;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.encyclopedia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.encyclopedia-card {
+  background: #F2EDE4;
+  border: 1px solid #d4b896;
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition: all 0.2s;
+}
+
+.encyclopedia-card:hover {
+  border-color: #C47F3C;
+  box-shadow: 0 2px 12px rgba(196,127,60,0.15);
+  transform: translateY(-2px);
+}
+
+.enc-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.enc-emoji { font-size: 2rem; }
+
+.enc-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: #C47F3C;
+  font-weight: 700;
+}
+
+.enc-history {
+  font-size: 0.85rem;
+  color: #2C1A0E;
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+
+.enc-meta {
+  font-size: 0.82rem;
+  color: #7a6550;
+  margin-bottom: 0.4rem;
+}
+
+.enc-tip {
+  background: #fff8f2;
+  border: 1px solid #C47F3C;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  color: #C47F3C;
+  font-weight: 600;
+  margin-top: 0.8rem;
+}
