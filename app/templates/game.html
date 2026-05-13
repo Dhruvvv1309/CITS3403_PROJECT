@@ -7,6 +7,7 @@
 
 {% block content %}
 <div class="game-wrapper">
+
   <div class="game-header">
     <h1>☕ Coffee Crafter</h1>
     <p>Pick your ingredients and discover what coffee you can make!</p>
@@ -23,7 +24,13 @@
         <div class="ingredient" data-id="whipped_cream">🍦 Whipped Cream</div>
         <div class="ingredient" data-id="chocolate">🍫 Chocolate</div>
         <div class="ingredient" data-id="cold_milk">🧊 Cold Milk</div>
-        <div class="ingredient" data-id="ice">🧊 Ice</div>
+        <div class="ingredient" data-id="ice">🧋 Ice</div>
+        <div class="ingredient" data-id="sugar">🍬 Sugar</div>
+        <div class="ingredient" data-id="cold_brew">🧃 Cold Brew</div>
+        <div class="ingredient" data-id="whiskey">🥃 Whiskey</div>
+        <div class="ingredient" data-id="ice_cream">🍨 Ice Cream</div>
+        <div class="ingredient" data-id="condensed_milk">🥤 Condensed Milk</div>
+        <div class="ingredient" data-id="matcha">🍵 Matcha Powder</div>
       </div>
     </div>
 
@@ -52,6 +59,13 @@
     <h2>☕ Your Coffee Collection</h2>
     <div class="collection-grid" id="collectionGrid"></div>
   </div>
+
+  <div class="encyclopedia-area">
+    <h2>📖 Coffee Encyclopedia</h2>
+    <p class="encyclopedia-sub">Learn about every coffee — then head up and try to brew it!</p>
+    <div class="encyclopedia-grid" id="encyclopediaGrid"></div>
+  </div>
+
 </div>
 {% endblock %}
 
