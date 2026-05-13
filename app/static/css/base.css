@@ -64,3 +64,15 @@ footer {
     padding: 1.2rem 0;
     text-align: center;
 }
+.logout-link {
+    color: #C47F3C !important;
+    border: 1px solid #C47F3C !important;
+    border-radius: 8px !important;
+    padding: 6px 14px !important;
+}
+
+.logout-link:hover {
+    color: #fff !important;
+    background: #C47F3C !important;
+    border-color: #C47F3C !important;
+}

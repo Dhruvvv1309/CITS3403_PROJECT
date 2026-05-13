@@ -18,6 +18,7 @@
             <li><a href="{{ url_for('explore') }}" class="{{ 'active' if request.endpoint == 'explore' else '' }}">Explore</a></li>
             <li><a href="{{ url_for('messages') }}" class="{{ 'active' if request.endpoint == 'messages' else '' }}">Messages</a></li>
             <li><a href="{{ url_for('game') }}" class="{{ 'active' if request.endpoint == 'game' else '' }}">Coffee Crafter</a></li>
+            <li><a href="#" onclick="confirmLogout(event)" class="logout-link">Logout</a></li>
         </ul>
     </nav>
 <!-- Main content area of each page that extends the base template -->
@@ -27,7 +28,14 @@
      <footer>
         cuplog · CITS3403/CITS5505 Group Project 2026
     </footer>
-
+    <script>
+    function confirmLogout(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+            window.location.href = "{{ url_for('logout') }}";
+    }
+}
+</script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
