@@ -12,7 +12,7 @@
 <nav class="top-nav">
   <a class="brand" href="#"><span>cup</span>log</a>
   <ul class="nav-links">
-    <li><a href="{{ url_for('game') }}">Coffee Crafter</a></li>
+    <li><a href="{{ url_for('main.game') }}">Coffee Crafter</a></li>
   </ul>
 </nav>
 <div class="page-wrapper">
@@ -42,7 +42,7 @@
         {{ form.submit(class="btn btn-login w-100 mt-2") }}
       </form>
       <div class="divider">or</div>
-      <a href="{{ url_for('signup') }}" class="btn btn-create w-100">Create an account</a>
+      <a href="{{ url_for('main.signup') }}" class="btn btn-create w-100">Create an account</a>
       <p class="text-center mt-3 small">
         <a href="#" class="forgot-link">Forgot password?</a>
       </p>

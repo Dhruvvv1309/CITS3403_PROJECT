@@ -11,13 +11,13 @@
 <body>
 
     <nav class="top-nav">
-        <a class="brand" href="{{ url_for('home') }}"><span>cup</span>log</a>
+        <a class="brand" href="{{ url_for('main.home') }}"><span>cup</span>log</a>
         <ul class="nav-links"> <!-- Add navigation links here -->
-            <li><a href="{{ url_for('my_journal') }}" class="{{ 'active' if request.endpoint == 'my_journal' else '' }}">My Journal</a></li>
-            <li><a href="{{ url_for('log_coffee') }}" class="{{ 'active' if request.endpoint == 'log_coffee' else '' }}">Log a Coffee</a></li>
-            <li><a href="{{ url_for('explore') }}" class="{{ 'active' if request.endpoint == 'explore' else '' }}">Explore</a></li>
-            <li><a href="{{ url_for('messages') }}" class="{{ 'active' if request.endpoint == 'messages' else '' }}">Messages</a></li>
-            <li><a href="{{ url_for('game') }}" class="{{ 'active' if request.endpoint == 'game' else '' }}">Coffee Crafter</a></li>
+            <li><a href="{{ url_for('main.my_journal') }}" class="{{ 'active' if request.endpoint == 'my_journal' else '' }}">My Journal</a></li>
+            <li><a href="{{ url_for('main.log_coffee') }}" class="{{ 'active' if request.endpoint == 'log_coffee' else '' }}">Log a Coffee</a></li>
+            <li><a href="{{ url_for('main.explore') }}" class="{{ 'active' if request.endpoint == 'explore' else '' }}">Explore</a></li>
+            <li><a href="{{ url_for('main.messages') }}" class="{{ 'active' if request.endpoint == 'messages' else '' }}">Messages</a></li>
+            <li><a href="{{ url_for('main.game') }}" class="{{ 'active' if request.endpoint == 'game' else '' }}">Coffee Crafter</a></li>
             <li><a href="#" onclick="confirmLogout(event)" class="logout-link">Logout</a></li>
         </ul>
     </nav>
@@ -32,7 +32,7 @@
     function confirmLogout(e) {
         e.preventDefault();
         if (confirm('Are you sure you want to logout?')) {
-            window.location.href = "{{ url_for('logout') }}";
+            window.location.href = "{{ url_for('main.logout') }}";
     }
 }
 </script>
