@@ -1,11 +1,13 @@
 from flask import flash, jsonify, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user, login_required, current_user
-from app import app, db
+from app import db
+from app.blueprints import main
 from app.forms import CoffeeLogForm, LoginForm, SignupForm
 import os
 from app.models import CoffeeLog, User
 from app.models import Message
 from sqlalchemy import or_, and_
+from flask import current_app
 
 
 def _user_initials(username):
@@ -124,43 +126,43 @@ def _current_user_logs():
     return CoffeeLog.query.filter_by(user_id=current_user.id).order_by(CoffeeLog.date_logged.desc()).all()
 
 
-@app.route('/', methods=['GET', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
 def home():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('my_journal'))
+            return redirect(url_for('main.my_journal'))
         flash('Invalid email or password')
     return render_template('login.html', form=form)
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@main.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
             flash('Email already registered. Please log in.')
-            return redirect(url_for('home'))
+            return redirect(url_for('main.home'))
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        return redirect(url_for('my_journal'))
+        return redirect(url_for('main.my_journal'))
     return render_template('signup.html', form=form)
 
 
-@app.route('/logout')
+@main.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
-@app.route('/my_journal')
+@main.route('/my_journal')
 @login_required
 def my_journal():
     using_fallback = False
@@ -187,7 +189,7 @@ def my_journal():
     )
 
 
-@app.route('/my_journal/<int:entry_id>/edit', methods=['POST'])
+@main.route('/my_journal/<int:entry_id>/edit', methods=['POST'])
 @login_required
 def edit_journal_entry(entry_id):
     entry = CoffeeLog.query.filter_by(id=entry_id, user_id=current_user.id).first()
@@ -215,7 +217,7 @@ def edit_journal_entry(entry_id):
     return jsonify({'success': True, 'entry': _journal_entry_from_log(entry)})
 
 
-@app.route('/my_journal/<int:entry_id>/delete', methods=['POST'])
+@main.route('/my_journal/<int:entry_id>/delete', methods=['POST'])
 @login_required
 def delete_journal_entry(entry_id):
     entry = CoffeeLog.query.filter_by(id=entry_id, user_id=current_user.id).first()
@@ -229,14 +231,14 @@ def delete_journal_entry(entry_id):
     return jsonify({'success': True, 'activity_badge': _activity_badge(entry_count), 'entry_count': entry_count})
 
 
-@app.route('/log-coffee', methods=['GET', 'POST'])
+@main.route('/log-coffee', methods=['GET', 'POST'])
 @login_required
 def log_coffee():
     form = CoffeeLogForm()
     if form.validate_on_submit():
         photo = form.photo.data
         photo_filename = photo.filename
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
+        photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], photo_filename))
         photo_path = f'uploads/{photo_filename}'
         entry = CoffeeLog(
             cafe_name=form.cafe_name.data,
@@ -248,11 +250,11 @@ def log_coffee():
         db.session.add(entry)
         db.session.commit()
         flash('Coffee logged successfully!')
-        return redirect(url_for('my_journal'))
+        return redirect(url_for('main.my_journal'))
     return render_template('log-coffee.html', title='Log a Coffee', form=form)
 
 
-@app.route('/game')
+@main.route('/game')
 def game():
     return render_template('game.html')
 
@@ -260,7 +262,7 @@ def game():
 
 # ── Explore (now passes real DB users) ──────────────────────
 
-@app.route('/explore')
+@main.route('/explore')
 @login_required
 def explore():                          # replaces the stub above
     users = User.query.all()
@@ -269,8 +271,8 @@ def explore():                          # replaces the stub above
 
 # ── Messages page ────────────────────────────────────────────
 
-@app.route('/messages')
-@app.route('/messages/<int:other_id>')
+@main.route('/messages')
+@main.route('/messages/<int:other_id>')
 @login_required
 def messages(other_id=None):
     """
@@ -325,7 +327,7 @@ def messages(other_id=None):
 
 # ── API: fetch messages between current user and another ─────
 
-@app.route('/api/messages/<int:other_id>')
+@main.route('/api/messages/<int:other_id>')
 @login_required
 def api_get_messages(other_id):
     other = User.query.get_or_404(other_id)
@@ -358,7 +360,7 @@ def api_get_messages(other_id):
 
 # ── API: send a message ───────────────────────────────────────
 
-@app.route('/api/messages/<int:other_id>/send', methods=['POST'])
+@main.route('/api/messages/<int:other_id>/send', methods=['POST'])
 @login_required
 def api_send_message(other_id):
     other = User.query.get_or_404(other_id)
@@ -377,7 +379,7 @@ def api_send_message(other_id):
 
 # ── API: unread count (for nav badge) ────────────────────────
 
-@app.route('/api/messages/unread')
+@main.route('/api/messages/unread')
 @login_required
 def api_unread_count():
     count = Message.query.filter_by(receiver_id=current_user.id, read=False).count()
@@ -388,7 +390,7 @@ def api_unread_count():
 
 # ── REPLACE the existing /api/match route in routes.py with this ──────────
 
-@app.route('/api/match')
+@main.route('/api/match')
 @login_required
 def api_match():
     """
