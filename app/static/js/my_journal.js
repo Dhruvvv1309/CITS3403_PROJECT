@@ -2,6 +2,8 @@ const detailButtons = document.querySelectorAll('.details-toggle');
 const journalCount = document.getElementById('journalCount');
 const journalSection = document.querySelector('.journal-section');
 const activityBadge = document.getElementById('activityBadge');
+const favoriteBadge = document.getElementById('favoriteBadge');
+const profileTagline = document.getElementById('profileTagline');
 
 detailButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -29,6 +31,22 @@ function updateActivityBadge(label) {
     }
 
     activityBadge.textContent = label;
+}
+
+function updateFavoriteBadge(label) {
+    if (!favoriteBadge || !label) {
+        return;
+    }
+
+    favoriteBadge.textContent = label;
+}
+
+function updateProfileTagline(label) {
+    if (!profileTagline || !label) {
+        return;
+    }
+
+    profileTagline.textContent = label;
 }
 
 function showEntryError(card, message) {
@@ -133,6 +151,8 @@ document.querySelectorAll('.entry-edit-form').forEach(form => {
             }
 
             updateEntryCard(card, data.entry);
+            updateFavoriteBadge(data.favorite_badge);
+            updateProfileTagline(data.profile_tagline);
             form.hidden = true;
         } catch (error) {
             showEntryError(card, error.message);
@@ -165,6 +185,8 @@ document.querySelectorAll('.delete-entry').forEach(button => {
             card.remove();
             updateCoffeeCount(data.entry_count);
             updateActivityBadge(data.activity_badge);
+            updateFavoriteBadge(data.favorite_badge);
+            updateProfileTagline(data.profile_tagline);
 
             if (data.entry_count === 0) {
                 showEmptyJournal();

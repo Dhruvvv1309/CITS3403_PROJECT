@@ -27,16 +27,31 @@ def _coffee_type_label(coffee_type):
     return (coffee_type or 'Coffee').replace('_', ' ').title()
 
 
-def _favorite_coffee_badge(logs):
+def _most_logged_coffee_type(logs):
     if not logs:
-        return 'No regular yet'
+        return None
 
     counts = {}
     for log in logs:
         counts[log.coffee_type] = counts.get(log.coffee_type, 0) + 1
 
-    favorite = max(counts, key=counts.get)
+    return max(counts, key=counts.get)
+
+
+def _favorite_coffee_badge(logs):
+    favorite = _most_logged_coffee_type(logs)
+    if not favorite:
+        return 'No regular yet'
+
     return f'{_coffee_type_label(favorite)} regular'
+
+
+def _profile_tagline(logs):
+    favorite = _most_logged_coffee_type(logs)
+    if not favorite:
+        return 'Coffee lover'
+
+    return f'{_coffee_type_label(favorite)} fan'
 
 
 def _activity_badge(entry_count):
@@ -171,11 +186,13 @@ def my_journal():
         entries = [_journal_entry_from_log(log) for log in coffee_logs]
         entry_count = len(entries)
         favorite_badge = _favorite_coffee_badge(coffee_logs)
+        profile_tagline = _profile_tagline(coffee_logs)
     except Exception:
         db.session.rollback()
         entries = _fallback_journal_entries()
         entry_count = len(entries)
         favorite_badge = _favorite_coffee_badge([])
+        profile_tagline = _profile_tagline([])
         using_fallback = True
 
     return render_template(
@@ -184,6 +201,7 @@ def my_journal():
         entries=entries,
         entry_count=entry_count,
         favorite_badge=favorite_badge,
+        profile_tagline=profile_tagline,
         user_initials=_user_initials(current_user.username),
         using_fallback=using_fallback,
     )
@@ -213,8 +231,14 @@ def edit_journal_entry(entry_id):
     entry.rating = rating
     entry.notes = data.get('notes', entry.notes)
     db.session.commit()
+    coffee_logs = _current_user_logs()
 
-    return jsonify({'success': True, 'entry': _journal_entry_from_log(entry)})
+    return jsonify({
+        'success': True,
+        'entry': _journal_entry_from_log(entry),
+        'favorite_badge': _favorite_coffee_badge(coffee_logs),
+        'profile_tagline': _profile_tagline(coffee_logs),
+    })
 
 
 @main.route('/my_journal/<int:entry_id>/delete', methods=['POST'])
@@ -227,8 +251,15 @@ def delete_journal_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     entry_count = _entry_count()
+    coffee_logs = _current_user_logs()
 
-    return jsonify({'success': True, 'activity_badge': _activity_badge(entry_count), 'entry_count': entry_count})
+    return jsonify({
+        'success': True,
+        'activity_badge': _activity_badge(entry_count),
+        'entry_count': entry_count,
+        'favorite_badge': _favorite_coffee_badge(coffee_logs),
+        'profile_tagline': _profile_tagline(coffee_logs),
+    })
 
 
 @main.route('/log-coffee', methods=['GET', 'POST'])
