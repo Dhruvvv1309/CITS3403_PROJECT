@@ -6,7 +6,8 @@
 
 .top-nav {
     background: #352010 !important;
-    padding: 1.2rem 2rem 0.6rem 2rem !important;
+    min-height: 88px !important;
+    padding: 0 2rem !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,6 +23,10 @@
     font-weight: 500 !important;
     color: #F2EDE4 !important;
     text-decoration: none !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 40px !important;
 }
 
 .brand span {
@@ -29,7 +34,7 @@
     font-weight: 700 !important;
 }
 
-.nav-links {
+.top-nav .nav-links {
     display: flex;
     align-items: center;
     gap: 2.6rem !important;
@@ -38,23 +43,34 @@
     padding: 0 !important;
 }
 
-.nav-links a {
+.top-nav .nav-links li {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.top-nav .nav-links a {
     color: #c8b99a !important;
     text-decoration: none !important;
     font-family: 'DM Sans', sans-serif !important;
     font-size: 1rem !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    min-height: 38px !important;
     padding: 6px 14px !important;
     border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
 }
 
-.nav-links a:hover {
+.top-nav .nav-links a:hover {
     color: #F2EDE4 !important;
     background: rgba(196,127,60,0.15) !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
 }
 
-.nav-links a.active {
+.top-nav .nav-links a.active {
     color: #F2EDE4 !important;
     background: rgba(196,127,60,0.15) !important;
     font-weight: 500 !important;
@@ -68,7 +84,7 @@ footer {
     padding: 1.2rem 0;
     text-align: center;
 }
-.nav-links a.logout-link {
+.top-nav .nav-links a.logout-link {
     color: #C47F3C !important;
     border: 1px solid #C47F3C !important;
     border-radius: 8px !important;
@@ -76,8 +92,9 @@ footer {
     background: transparent !important;
 }
 
-.nav-links a.logout-link:hover {
+.top-nav .nav-links a.logout-link:hover {
     color: #fff !important;
     background: #C47F3C !important;
     border-color: #C47F3C !important;
+    font-weight: 500 !important;
 }
