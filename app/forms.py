@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, Optional, Email, EqualTo, Length
-from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_wtf.file import FileField, FileAllowed
 
 class CoffeeLogForm(FlaskForm):
     cafe_name=StringField('Cafe Name', validators=[DataRequired()])
@@ -19,7 +19,7 @@ class CoffeeLogForm(FlaskForm):
         ('mocha', 'Mocha'), 
     ], validators=[DataRequired()])
     rating=IntegerField('Rating', validators=[DataRequired()])
-    photo=FileField('Add a Photo', validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
+    photo=FileField('Add a Photo', validators=[Optional(), FileAllowed(['jpg', 'jpeg', 'png'])])
     notes=TextAreaField('Notes', validators=[Optional()])
     submit=SubmitField('Save to journal')
 

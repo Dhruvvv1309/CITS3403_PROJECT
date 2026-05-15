@@ -267,10 +267,12 @@ def delete_journal_entry(entry_id):
 def log_coffee():
     form = CoffeeLogForm()
     if form.validate_on_submit():
-        photo = form.photo.data
-        photo_filename = photo.filename
-        photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], photo_filename))
-        photo_path = f'uploads/{photo_filename}'
+        photo_path= None
+        if form.photo.data:
+            photo = form.photo.data
+            photo_filename = photo.filename
+            photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], photo_filename))
+            photo_path = f'uploads/{photo_filename}'
         entry = CoffeeLog(
             cafe_name=form.cafe_name.data,
             coffee_type=form.coffee_type.data,
