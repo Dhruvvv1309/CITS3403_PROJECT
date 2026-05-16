@@ -115,6 +115,28 @@ class CoffeeLogSeleniumTests(SeleniumBaseTest):
             self.assertEqual(log.coffee_type, "latte")
             self.assertEqual(log.rating, 3)
 
+class GameSeleniumTests(SeleniumBaseTest):
 
+    # Test: Game page loads after login
+    def test_game_page_loads(self):
+        self.login()
+        self.driver.get(localHost + "game")
+        time.sleep(1)
+        self.assertIn("game", self.driver.current_url)
+        self.assertIn("Coffee Crafter", self.driver.page_source)
+
+    # Test: Game page shows ingredients
+    def test_game_shows_ingredients(self):
+        self.login()
+        self.driver.get(localHost + "game")
+        time.sleep(1)
+        ingredients = self.driver.find_elements(By.CLASS_NAME, "ingredient")
+        self.assertGreater(len(ingredients), 0, "Game page should show ingredients")
+
+    # Test: Game page redirects to login when not logged in
+    def test_game_requires_login(self):
+        self.driver.get(localHost + "game")
+        time.sleep(1)
+        self.assertNotIn("game", self.driver.current_url)
 if __name__ == '__main__':
     unittest.main()
