@@ -85,7 +85,7 @@
                 New member
               {% endif %}
             </span><br>
-            <a href="{{ url_for('messages', other_id=user.id) }}" style="text-decoration:none;">
+            <a href="{{ url_for('main.messages', other_id=user.id) }}" style="text-decoration:none;">
               <button class="view-btn">Message</button>
             </a>
           </div>

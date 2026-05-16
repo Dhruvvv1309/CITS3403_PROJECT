@@ -36,6 +36,16 @@
   background: rgba(196,127,60,0.15) !important;
 }
 
+/* ── FOOTER FIX ── */
+footer {
+  font-family: 'DM Sans', sans-serif !important;
+  background: #2C1A0E !important;
+  color: #7a6550 !important;
+  font-size: 0.8rem !important;
+  padding: 1.2rem 0 !important;
+  text-align: center !important;
+}
+
 /* ── PAGE ── */
 main {
   background-color: #2C1A0E;
@@ -52,7 +62,7 @@ main {
 }
 
 /* ════════════════════════
-   SIDEBAR — dark brown (#352010 = btn-log bg)
+   SIDEBAR
 ════════════════════════ */
 .conv-sidebar {
   background-color: #352010;
@@ -78,7 +88,7 @@ main {
   color: #F2EDE4;
 }
 
-/* Search */
+/* ── SEARCH — text is dark so it's visible on the input ── */
 .conv-search {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(212,184,150,0.2);
@@ -88,10 +98,10 @@ main {
 .conv-search input,
 #modalSearch {
   width: 100%;
-  background-color: rgba(242,237,228,0.1);
-  border: 1px solid rgba(212,184,150,0.4);
+  background-color: #FAF7F2;
+  border: 1px solid #d4b896;
   border-radius: 8px;
-  color: #F2EDE4;
+  color: #2C1A0E;
   padding: 10px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.9rem;
@@ -360,14 +370,12 @@ main {
   word-break: break-word;
 }
 
-/* Sent bubble matches btn-log style */
 .msg-row.sent .bubble {
   background-color: #C47F3C;
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 
-/* Received bubble is a darker version of the cream card */
 .msg-row.received .bubble {
   background-color: #3d2510;
   border: 1px solid rgba(212,184,150,0.25);
@@ -400,10 +408,10 @@ main {
 
 .chat-composer input {
   flex: 1;
-  background-color: rgba(242,237,228,0.1);
-  border: 1px solid rgba(212,184,150,0.4);
+  background-color: #FAF7F2;
+  border: 1px solid #d4b896;
   border-radius: 8px;
-  color: #F2EDE4;
+  color: #2C1A0E;
   padding: 10px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.9rem;
@@ -476,7 +484,6 @@ main {
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Modal card matches .log-card */
 .modal {
   background-color: #F2EDE4;
   border: 1px solid #d4b896;
@@ -511,7 +518,6 @@ main {
   margin-bottom: 1rem;
 }
 
-/* Modal icon btn (close) on cream bg */
 .modal .icon-btn {
   border-color: #d4b896;
   color: #7a6550;
