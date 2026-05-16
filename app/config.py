@@ -11,7 +11,7 @@ class DeploymentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('CUPLOG_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
     TESTING = True
     WTF_CSRF_ENABLED = False
     SECRET_KEY='test-secret-key'
