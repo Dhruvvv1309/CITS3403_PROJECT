@@ -37,6 +37,16 @@
   background: rgba(196,127,60,0.15) !important;
 }
 
+/* ── FOOTER FIX ── */
+footer {
+  font-family: 'DM Sans', sans-serif !important;
+  background: #2C1A0E !important;
+  color: #7a6550 !important;
+  font-size: 0.8rem !important;
+  padding: 1.2rem 0 !important;
+  text-align: center !important;
+}
+
 /* ── PAGE BACKGROUND ── */
 main {
   background-color: #2C1A0E;
