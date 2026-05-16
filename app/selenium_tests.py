@@ -3,6 +3,8 @@ import time
 import sys
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
 from app import create_app, db
 from app.config import TestConfig
 from app.models import User, CoffeeLog
@@ -14,15 +16,16 @@ def add_test_data_to_db():
     user.set_password('password123')
     db.session.add(user)
     db.session.commit()
+    return user
 
-class CoffeeLogSeleniumTests(unittest.TestCase):
+class SeleniumBaseTest(unittest.TestCase):
 
     def setUp(self):
         self.testApp = create_app(TestConfig)
         self.app_context = self.testApp.app_context()
         self.app_context.push()
         db.create_all()
-        add_test_data_to_db()
+        self.user = add_test_data_to_db()
 
         # Use threading on Mac, multiprocessing on Windows/Linux
         if sys.platform == 'darwin':
@@ -41,6 +44,7 @@ class CoffeeLogSeleniumTests(unittest.TestCase):
         time.sleep(2)
 
         self.driver = webdriver.Chrome()
+        self.wait = WebDriverWait(self.driver, 5)
 
     def tearDown(self):
         if sys.platform != 'darwin':
@@ -54,14 +58,19 @@ class CoffeeLogSeleniumTests(unittest.TestCase):
         if os.path.exists('test.db'):
             os.remove('test.db')
 
-    # Test: Log coffee page loads after login
-    def test_log_coffee_page_loads(self):
-        # Log in first
+    def login(self):
         self.driver.get(localHost)
-        self.driver.find_element(By.NAME, "email").send_keys("test@test.com")
+        self.wait.until(EC.presence_of_element_located((By.NAME, "email"))).send_keys("test@test.com")
         self.driver.find_element(By.NAME, "password").send_keys("password123")
         self.driver.find_element(By.NAME, "submit").click()
-        time.sleep(1)
+        self.wait.until(lambda driver: "my_journal" in driver.current_url or "My Journal" in driver.page_source)
+
+
+class CoffeeLogSeleniumTests(SeleniumBaseTest):
+
+    # Test: Log coffee page loads after login
+    def test_log_coffee_page_loads(self):
+        self.login()
 
         # Navigate to log coffee page
         self.driver.get(localHost + "log-coffee")
@@ -73,12 +82,7 @@ class CoffeeLogSeleniumTests(unittest.TestCase):
 
     # Test: User can submit the log coffee form
     def test_log_coffee_form_submit(self):
-        # Log in first
-        self.driver.get(localHost)
-        self.driver.find_element(By.NAME, "email").send_keys("test@test.com")
-        self.driver.find_element(By.NAME, "password").send_keys("password123")
-        self.driver.find_element(By.NAME, "submit").click()
-        time.sleep(1)
+        self.login()
 
         # Navigate to log coffee page
         self.driver.get(localHost + "log-coffee")
@@ -89,7 +93,6 @@ class CoffeeLogSeleniumTests(unittest.TestCase):
         self.driver.execute_script("arguments[0].value = 'Test Cafe';", cafe_name)
 
         # Select coffee type from dropdown
-        from selenium.webdriver.support.ui import Select
         Select(self.driver.find_element(By.ID, "coffeeType")).select_by_value("latte")
 
         # Click the 3rd star for rating
@@ -111,5 +114,7 @@ class CoffeeLogSeleniumTests(unittest.TestCase):
             self.assertIsNotNone(log, "Coffee log should be saved to the database")
             self.assertEqual(log.coffee_type, "latte")
             self.assertEqual(log.rating, 3)
+
+
 if __name__ == '__main__':
     unittest.main()
