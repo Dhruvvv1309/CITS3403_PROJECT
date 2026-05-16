@@ -3,33 +3,33 @@ import threading
 import time
 import os
 import tempfile
+import sys
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
 from app import create_app, db
-from app.models import User, Message
+from app.config import TestConfig
+from app.models import User, CoffeeLog, Message
 
+# ── Shared server for Messages/Explore tests (port 5001, headless) ──
 BASE_URL = 'http://127.0.0.1:5001'
 
-# ── Module-level shared state ──────────────────────────────────
 _driver     = None
 _app        = None
 _ctx        = None
 _db_path    = None
-_server_started = False
 
 
 def setUpModule():
     """Runs once before ALL tests in this file."""
-    global _driver, _app, _ctx, _db_path, _server_started
+    global _driver, _app, _ctx, _db_path
 
-    # Use a temp file DB so the Flask thread can access it
     _db_fd, _db_path = tempfile.mkstemp(suffix='.db')
     os.close(_db_fd)
 
@@ -47,7 +47,6 @@ def setUpModule():
 
     db.create_all()
 
-    # Create test users
     u1 = User(username='selenium_user1', email='sel1@test.com')
     u1.set_password('password123')
     u2 = User(username='selenium_user2', email='sel2@test.com')
@@ -55,7 +54,6 @@ def setUpModule():
     db.session.add_all([u1, u2])
     db.session.commit()
 
-    # Start Flask server in background thread
     t = threading.Thread(
         target=_app.run,
         kwargs={'port': 5001, 'use_reloader': False, 'debug': False, 'threaded': True}
@@ -63,9 +61,7 @@ def setUpModule():
     t.daemon = True
     t.start()
     time.sleep(2)
-    _server_started = True
 
-    # Set up headless Chrome
     opts = Options()
     opts.add_argument('--headless')
     opts.add_argument('--no-sandbox')
@@ -80,17 +76,14 @@ def setUpModule():
 
 
 def tearDownModule():
-    """Runs once after ALL tests in this file."""
     global _driver, _ctx, _db_path
 
     if _driver:
         _driver.quit()
-
     if _ctx:
         db.session.remove()
         db.drop_all()
         _ctx.pop()
-
     if _db_path and os.path.exists(_db_path):
         try:
             os.unlink(_db_path)
@@ -99,7 +92,7 @@ def tearDownModule():
 
 
 class SeleniumBase(unittest.TestCase):
-    """Base class — uses the shared module-level driver and app."""
+    """Base class for Messages/Explore UI tests — uses shared headless driver."""
 
     def setUp(self):
         self.driver = _driver
@@ -119,6 +112,10 @@ class SeleniumBase(unittest.TestCase):
         self.driver.get(f'{BASE_URL}/logout')
         self.wait.until(EC.url_contains('/'))
 
+
+# ════════════════════════════════════════════
+#  MESSAGES UI TESTS
+# ════════════════════════════════════════════
 
 class TestMessagesUI(SeleniumBase):
 
@@ -152,9 +149,7 @@ class TestMessagesUI(SeleniumBase):
     def test_messages_sidebar_shows_users(self):
         self.login()
         self.driver.get(f'{BASE_URL}/messages')
-        self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-list'))
-        )
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-list')))
         conv_items = self.driver.find_elements(By.CSS_SELECTOR, '.conv-item')
         self.assertGreater(len(conv_items), 0,
                            'Sidebar should show at least one user to message')
@@ -163,13 +158,9 @@ class TestMessagesUI(SeleniumBase):
     def test_clicking_user_opens_chat(self):
         self.login()
         self.driver.get(f'{BASE_URL}/messages')
-        self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item'))
-        )
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item')))
         self.driver.find_element(By.CSS_SELECTOR, '.conv-item').click()
-        chat_active = self.wait.until(
-            EC.visibility_of_element_located((By.ID, 'chatActive'))
-        )
+        chat_active = self.wait.until(EC.visibility_of_element_located((By.ID, 'chatActive')))
         self.assertTrue(chat_active.is_displayed(),
                         'Chat panel should be visible after clicking a user')
 
@@ -177,12 +168,9 @@ class TestMessagesUI(SeleniumBase):
     def test_message_composer_present(self):
         self.login()
         self.driver.get(f'{BASE_URL}/messages')
-        self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item'))
-        )
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item')))
         self.driver.find_element(By.CSS_SELECTOR, '.conv-item').click()
         self.wait.until(EC.visibility_of_element_located((By.ID, 'msgInput')))
-
         msg_input = self.driver.find_element(By.ID, 'msgInput')
         send_btn  = self.driver.find_element(By.CSS_SELECTOR, '.send-btn')
         self.assertTrue(msg_input.is_displayed(), 'Message input should be visible')
@@ -192,26 +180,22 @@ class TestMessagesUI(SeleniumBase):
     def test_send_message_appears_in_chat(self):
         self.login()
         self.driver.get(f'{BASE_URL}/messages')
-        self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item'))
-        )
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.conv-item')))
         self.driver.find_element(By.CSS_SELECTOR, '.conv-item').click()
         self.wait.until(EC.visibility_of_element_located((By.ID, 'msgInput')))
-
         msg_input = self.driver.find_element(By.ID, 'msgInput')
         msg_input.send_keys('Hello from Selenium!')
         msg_input.send_keys(Keys.RETURN)
-
-        self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.msg-row.sent'))
-        )
+        self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.msg-row.sent')))
         sent_bubbles = self.driver.find_elements(By.CSS_SELECTOR, '.msg-row.sent .bubble')
         texts = [b.text for b in sent_bubbles]
-        self.assertTrue(
-            any('Hello from Selenium!' in t for t in texts),
-            'Sent message should appear in the chat'
-        )
+        self.assertTrue(any('Hello from Selenium!' in t for t in texts),
+                        'Sent message should appear in the chat')
 
+
+# ════════════════════════════════════════════
+#  EXPLORE UI TESTS
+# ════════════════════════════════════════════
 
 class TestExploreUI(SeleniumBase):
 
@@ -242,8 +226,7 @@ class TestExploreUI(SeleniumBase):
                 (By.XPATH, "//button[contains(text(), 'Find My Match')]")
             )
         )
-        self.assertTrue(btn.is_displayed(),
-                        'Find My Match button should be visible')
+        self.assertTrue(btn.is_displayed(), 'Find My Match button should be visible')
 
     # Selenium Test 11: Coffee type dropdown has correct options
     def test_coffee_dropdown_options(self):
@@ -302,18 +285,115 @@ class TestExploreUI(SeleniumBase):
         self.login()
         self.driver.get(f'{BASE_URL}/explore')
         self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.map-section')))
-
-        # Scroll to it
         self.driver.execute_script(
             'document.querySelector(".map-section").scrollIntoView(true);'
         )
         time.sleep(0.5)
-
         exists = self.driver.execute_script(
             'return document.querySelector(".map-section") !== null'
         )
-        self.assertTrue(exists,
-                        'Perth CBD map section should exist on the explore page')
+        self.assertTrue(exists, 'Perth CBD map section should exist on the explore page')
+
+
+# ════════════════════════════════════════════
+#  COFFEE LOG SELENIUM TESTS (teammates)
+# ════════════════════════════════════════════
+
+LOCAL_HOST = 'http://127.0.0.1:5000/'
+
+
+def add_test_data_to_db():
+    user = User(username='testuser', email='test@test.com')
+    user.set_password('password123')
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+class SeleniumBaseTest(unittest.TestCase):
+    """Base class for CoffeeLog Selenium tests — uses visible Chrome on port 5000."""
+
+    def setUp(self):
+        self.testApp = create_app(TestConfig)
+        self.app_context = self.testApp.app_context()
+        self.app_context.push()
+        db.create_all()
+        self.user = add_test_data_to_db()
+
+        if sys.platform == 'darwin':
+            def run_app():
+                with self.testApp.app_context():
+                    self.testApp.run()
+            self.server_thread = threading.Thread(target=run_app)
+            self.server_thread.daemon = True
+            self.server_thread.start()
+        else:
+            import multiprocessing
+            self.server_thread = multiprocessing.Process(target=self.testApp.run)
+            self.server_thread.start()
+
+        time.sleep(2)
+        self.driver = webdriver.Chrome()
+        self.wait = WebDriverWait(self.driver, 5)
+
+    def tearDown(self):
+        if sys.platform != 'darwin':
+            self.server_thread.terminate()
+        self.driver.quit()
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+        if os.path.exists('test.db'):
+            os.remove('test.db')
+
+    def login(self):
+        self.driver.get(LOCAL_HOST)
+        self.wait.until(
+            EC.presence_of_element_located((By.NAME, 'email'))
+        ).send_keys('test@test.com')
+        self.driver.find_element(By.NAME, 'password').send_keys('password123')
+        self.driver.find_element(By.NAME, 'submit').click()
+        self.wait.until(
+            lambda d: 'my_journal' in d.current_url or 'My Journal' in d.page_source
+        )
+
+
+class CoffeeLogSeleniumTests(SeleniumBaseTest):
+
+    # Selenium Test: Log coffee page loads after login
+    def test_log_coffee_page_loads(self):
+        self.login()
+        self.driver.get(LOCAL_HOST + 'log-coffee')
+        time.sleep(1)
+        self.assertIn('log-coffee', self.driver.current_url)
+        self.assertIn('drinking', self.driver.page_source.lower())
+
+    # Selenium Test: User can submit the log coffee form
+    def test_log_coffee_form_submit(self):
+        self.login()
+        self.driver.get(LOCAL_HOST + 'log-coffee')
+        time.sleep(1)
+
+        cafe_name = self.driver.find_element(By.ID, 'cafeName')
+        self.driver.execute_script("arguments[0].value = 'Test Cafe';", cafe_name)
+
+        Select(self.driver.find_element(By.ID, 'coffeeType')).select_by_value('latte')
+
+        stars = self.driver.find_elements(By.CLASS_NAME, 'star')
+        self.driver.execute_script('arguments[0].click();', stars[2])
+
+        notes = self.driver.find_element(By.ID, 'notes')
+        self.driver.execute_script("arguments[0].value = 'Great coffee!';", notes)
+
+        submit = self.driver.find_element(By.NAME, 'submit')
+        self.driver.execute_script('arguments[0].click();', submit)
+        time.sleep(1)
+
+        with self.testApp.app_context():
+            log = CoffeeLog.query.filter_by(cafe_name='Test Cafe').first()
+            self.assertIsNotNone(log, 'Coffee log should be saved to the database')
+            self.assertEqual(log.coffee_type, 'latte')
+            self.assertEqual(log.rating, 3)
 
 
 if __name__ == '__main__':

@@ -34,7 +34,7 @@ class User(db.Model, UserMixin):
     coffee_logs = db.relationship('CoffeeLog', backref='user', lazy=True, foreign_keys='CoffeeLog.user_id')
     
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

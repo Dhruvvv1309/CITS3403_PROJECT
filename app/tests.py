@@ -57,6 +57,75 @@ class CoffeeLogTests(unittest.TestCase):
         self.assertIn('/', response.location, 'Should redirect to login page')
 
 
+class LoginSignupTests(unittest.TestCase):
+
+    def setUp(self):
+        test_app = create_app(TestConfig)
+        self.app_context = test_app.app_context()
+        self.app_context.push()
+        self.client = test_app.test_client()
+        db.create_all()
+        add_test_data_to_db()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    # Test 3: Login page loads successfully
+    def test_login_page_loads(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200, 'Login page should load with status 200')
+        self.assertIn(b'Log in', response.data, 'Login page should contain Log in text')
+
+    # Test 4: Login with correct credentials redirects to journal
+    def test_login_valid_credentials(self):
+        response = self.client.post('/', data={
+            'email': 'test@test.com',
+            'password': 'password123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200, 'Valid login should succeed')
+
+    # Test 5: Login with wrong password shows error
+    def test_login_invalid_credentials(self):
+        response = self.client.post('/', data={
+            'email': 'test@test.com',
+            'password': 'wrongpassword'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200, 'Invalid login should return 200')
+        self.assertIn(b'Invalid email or password', response.data, 'Should show error message')
+
+    # Test 6: Signup page loads successfully
+    def test_signup_page_loads(self):
+        response = self.client.get('/signup')
+        self.assertEqual(response.status_code, 200, 'Signup page should load with status 200')
+        self.assertIn(b'Create account', response.data, 'Signup page should contain Create account text')
+
+    # Test 7: Signup creates a new user in the database
+    def test_signup_creates_user(self):
+        response = self.client.post('/signup', data={
+            'username': 'newuser',
+            'email': 'newuser@test.com',
+            'password': 'password123',
+            'confirm_password': 'password123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200, 'Signup should succeed')
+        user = User.query.filter_by(email='newuser@test.com').first()
+        self.assertIsNotNone(user, 'New user should be saved to database')
+        self.assertEqual(user.username, 'newuser', 'Username should match')
+
+    # Test 8: Signup with existing email shows error
+    def test_signup_duplicate_email(self):
+        response = self.client.post('/signup', data={
+            'username': 'anotheruser',
+            'email': 'test@test.com',
+            'password': 'password123',
+            'confirm_password': 'password123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200, 'Duplicate signup should return 200')
+        self.assertIn(b'Email already registered', response.data, 'Should show duplicate email error')
+
+
 class MessagingTests(unittest.TestCase):
 
     def setUp(self):
@@ -78,20 +147,20 @@ class MessagingTests(unittest.TestCase):
             'password': password
         }, follow_redirects=True)
 
-    # Test 3: Messages page requires login
+    # Test 9: Messages page requires login
     def test_messages_requires_login(self):
         response = self.client.get('/messages', follow_redirects=False)
         self.assertEqual(response.status_code, 302,
                          'Unauthenticated user should be redirected from messages')
 
-    # Test 4: Messages page loads for logged-in user
+    # Test 10: Messages page loads for logged-in user
     def test_messages_page_loads(self):
         self.login()
         response = self.client.get('/messages')
         self.assertEqual(response.status_code, 200,
                          'Messages page should load for authenticated user')
 
-    # Test 5: Message is saved to database
+    # Test 11: Message is saved to database
     def test_message_saved_to_db(self):
         user1 = User.query.filter_by(username='testuser').first()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -110,7 +179,7 @@ class MessagingTests(unittest.TestCase):
         self.assertEqual(saved.receiver_id, user2.id, 'Receiver should be user2')
         self.assertFalse(saved.read, 'New message should be unread by default')
 
-    # Test 6: Send message via API
+    # Test 12: Send message via API
     def test_api_send_message(self):
         self.login()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -126,7 +195,7 @@ class MessagingTests(unittest.TestCase):
         self.assertEqual(data['message']['body'], 'Test API message',
                          'Returned message body should match sent body')
 
-    # Test 7: Fetch messages via API
+    # Test 13: Fetch messages via API
     def test_api_get_messages(self):
         self.login()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -144,7 +213,7 @@ class MessagingTests(unittest.TestCase):
         self.assertEqual(len(data['messages']), 1, 'Should have 1 message')
         self.assertEqual(data['messages'][0]['body'], 'Hello!', 'Message body should match')
 
-    # Test 8: Empty message body is rejected
+    # Test 14: Empty message body is rejected
     def test_api_send_empty_message_rejected(self):
         self.login()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -158,7 +227,7 @@ class MessagingTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400, 'Empty message should return 400')
         self.assertFalse(data['success'], 'Empty message should return success=False')
 
-    # Test 9: Unread count API returns correct value
+    # Test 15: Unread count API returns correct value
     def test_api_unread_count(self):
         self.login()
         response = self.client.get('/api/messages/unread')
@@ -167,7 +236,7 @@ class MessagingTests(unittest.TestCase):
         self.assertIn('unread', data, 'Response should contain unread key')
         self.assertEqual(data['unread'], 0, 'New user should have 0 unread messages')
 
-    # Test 10: Messages are marked as read when fetched
+    # Test 16: Messages are marked as read when fetched
     def test_messages_marked_as_read(self):
         user1 = User.query.filter_by(username='testuser').first()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -204,20 +273,20 @@ class ExploreTests(unittest.TestCase):
             'password': 'password123'
         }, follow_redirects=True)
 
-    # Test 11: Explore page requires login
+    # Test 17: Explore page requires login
     def test_explore_requires_login(self):
         response = self.client.get('/explore', follow_redirects=False)
         self.assertEqual(response.status_code, 302,
                          'Unauthenticated user should be redirected from explore')
 
-    # Test 12: Explore page loads for logged-in user
+    # Test 18: Explore page loads for logged-in user
     def test_explore_page_loads(self):
         self.login()
         response = self.client.get('/explore')
         self.assertEqual(response.status_code, 200,
                          'Explore page should load for authenticated user')
 
-    # Test 13: Match API returns failure when user has no logs
+    # Test 19: Match API returns failure when user has no logs
     def test_match_api_no_logs(self):
         self.login()
         response = self.client.get('/api/match')
@@ -226,7 +295,7 @@ class ExploreTests(unittest.TestCase):
         self.assertFalse(data['success'],
                          'Match should fail when user has no coffee logs')
 
-    # Test 14: Match API finds users with same coffee type
+    # Test 20: Match API finds users with same coffee type
     def test_match_api_finds_shared_coffee(self):
         user1 = User.query.filter_by(username='testuser').first()
         user2 = User.query.filter_by(username='testuser2').first()
@@ -245,7 +314,7 @@ class ExploreTests(unittest.TestCase):
         self.assertEqual(data['matches'][0]['username'], 'testuser2',
                          'Matched user should be testuser2')
 
-    # Test 15: Match API finds users at same cafe (partial match)
+    # Test 21: Match API finds users at same cafe (partial match)
     def test_match_api_finds_shared_cafe(self):
         user1 = User.query.filter_by(username='testuser').first()
         user2 = User.query.filter_by(username='testuser2').first()
